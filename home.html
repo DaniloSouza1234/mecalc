@@ -30,13 +30,13 @@
 
 <main class="wrap">
 
-  <!-- BLOCO DA ENGRENAGEM ANIMADA -->
+  <!-- HERO COM ENGRENAGEM -->
   <section class="card hero-card">
     <div class="hero-visual">
       <div class="gear"></div>
     </div>
 
-    <p class="hero-text">
+    <p class="hero-text para">
       Plataforma de cálculos para engenharia mecânica industrial, 
       focada em projetos de máquinas, automação e sistemas de transporte.
     </p>
@@ -107,20 +107,22 @@
 
 <!-- SCRIPT DO EFEITO "DIGITANDO" NO TÍTULO -->
 <script>
-  const text = " – Ferramentas de Engenharia Mecânica";
-  let i = 0;
-
-  function type(){
+  document.addEventListener("DOMContentLoaded", function () {
+    const text = " – Ferramentas de Engenharia Mecânica";
     const span = document.getElementById("typing");
-    if(!span) return;
-    if(i < text.length){
-      span.innerHTML += text.charAt(i);
-      i++;
-      setTimeout(type, 70); // velocidade da digitação
-    }
-  }
+    if (!span) return;
+    let i = 0;
 
-  document.addEventListener("DOMContentLoaded", type);
+    function type(){
+      if(i < text.length){
+        span.textContent += text.charAt(i);
+        i++;
+        setTimeout(type, 80); // velocidade da digitação
+      }
+    }
+
+    type();
+  });
 </script>
 
 </body>
