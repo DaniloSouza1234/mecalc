@@ -13,8 +13,14 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // ================= Dados da tabela de força =================
   const bores = [10, 12, 16, 20, 25, 32, 40, 50, 63, 80, 100, 125, 160, 200, 250, 320];
-  const pressuresBase = [2, 4, 6, 8, 10]; // bar
 
+  // Pressões base para cálculo direto:
+  const pressuresBase = [2, 4, 6, 8, 10];
+
+  // Pressões exibidas na tabela (todas de 2 até 10):
+  const pressuresDisplay = [2, 3, 4, 5, 6, 7, 8, 9, 10];
+
+  // força em kgf para cada diâmetro e pressão base
   const forceData = {}; // forceData[diam][press] = { ext: kgf, ret: kgf }
 
   bores.forEach(d => {
@@ -40,7 +46,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     let pLow, pHigh;
-    if (pd === 3) { pLow = 2; pHigh = 4; }
+    if      (pd === 3) { pLow = 2; pHigh = 4; }
     else if (pd === 5) { pLow = 4; pHigh = 6; }
     else if (pd === 7) { pLow = 6; pHigh = 8; }
     else if (pd === 9) { pLow = 8; pHigh = 10; }
@@ -48,9 +54,9 @@ document.addEventListener("DOMContentLoaded", function () {
       return NaN;
     }
 
-    const F_low = forceData[d][pLow][kind];
+    const F_low  = forceData[d][pLow][kind];
     const F_high = forceData[d][pHigh][kind];
-    const frac = (pd - pLow) / (pHigh - pLow);
+    const frac   = (pd - pLow) / (pHigh - pLow);
     return F_low + (F_high - F_low) * frac;
   }
 
@@ -66,7 +72,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Cabeçalho
     let thead = "<thead><tr><th>Ø (mm)</th>";
-    pressuresBase.forEach(p => {
+    pressuresDisplay.forEach(p => {
       thead += `<th data-pressure="${p}">${p} bar<br><span style="font-size:11px;">Av / Ret (kgf)</span></th>`;
     });
     thead += "</tr></thead>";
@@ -75,9 +81,24 @@ document.addEventListener("DOMContentLoaded", function () {
     let tbody = "<tbody>";
     bores.forEach(d => {
       tbody += `<tr data-bore="${d}"><td>${d}</td>`;
-      pressuresBase.forEach(p => {
-        const F = forceData[d][p];
-        tbody += `<td>Av: ${formatNumber(F.ext,1)}<br>Ret: ${formatNumber(F.ret,1)}</td>`;
+      pressuresDisplay.forEach(p => {
+        const kindExt = "ext";
+        const kindRet = "ret";
+        let Fext, Fret;
+
+        if (pressuresBase.includes(p)) {
+          Fext = forceData[d][p][kindExt];
+          Fret = forceData[d][p][kindRet];
+        } else {
+          Fext = getInterpolatedForce(d, p, kindExt);
+          Fret = getInterpolatedForce(d, p, kindRet);
+        }
+
+        if (!isFinite(Fext) || !isFinite(Fret)) {
+          tbody += `<td>-</td>`;
+        } else {
+          tbody += `<td>Av: ${formatNumber(Fext,1)}<br>Ret: ${formatNumber(Fret,1)}</td>`;
+        }
       });
       tbody += "</tr>";
     });
@@ -102,13 +123,13 @@ document.addEventListener("DOMContentLoaded", function () {
     const boreVal = Number(boreSelect.value);
     const pVal = Number(pressureSelect.value || 0);
 
-    // limpar
+    // limpar destaques
     forceTable.querySelectorAll("tr.highlight-row")
       .forEach(tr => tr.classList.remove("highlight-row"));
     forceTable.querySelectorAll("th.highlight-pressure")
       .forEach(th => th.classList.remove("highlight-pressure"));
 
-    // linha
+    // linha (diâmetro)
     if (boreVal) {
       const rows = forceTable.querySelectorAll("tbody tr");
       rows.forEach(tr => {
@@ -117,24 +138,12 @@ document.addEventListener("DOMContentLoaded", function () {
       });
     }
 
-    // pressão
+    // coluna (pressão exata escolhida)
     if (pVal) {
-      let targets = [];
-      if (pressuresBase.includes(pVal)) {
-        targets = [pVal];
-      } else if (pVal === 3) {
-        targets = [2, 4];
-      } else if (pVal === 5) {
-        targets = [4, 6];
-      } else if (pVal === 7) {
-        targets = [6, 8];
-      } else if (pVal === 9) {
-        targets = [8, 10];
-      }
       const ths = forceTable.querySelectorAll("thead th[data-pressure]");
       ths.forEach(th => {
         const ph = Number(th.getAttribute("data-pressure"));
-        if (targets.includes(ph)) th.classList.add("highlight-pressure");
+        if (ph === pVal) th.classList.add("highlight-pressure");
       });
     }
   }
@@ -143,7 +152,7 @@ document.addEventListener("DOMContentLoaded", function () {
     buildForceTable();
     populateBoreSelect();
 
-    if (boreSelect) boreSelect.addEventListener("change", highlightSelection);
+    if (boreSelect)     boreSelect.addEventListener("change",   highlightSelection);
     if (pressureSelect) pressureSelect.addEventListener("change", highlightSelection);
 
     if (searchInput) {
@@ -166,9 +175,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
     if (clearBtn) {
       clearBtn.addEventListener("click", function () {
-        if (boreSelect) boreSelect.selectedIndex = 0;
+        if (boreSelect)     boreSelect.selectedIndex = 0;
         if (pressureSelect) pressureSelect.value = "";
-        if (searchInput) searchInput.value = "";
+        if (searchInput)    searchInput.value = "";
         if (forceTable) {
           forceTable.querySelectorAll("tr.highlight-row")
             .forEach(tr => tr.classList.remove("highlight-row"));
@@ -210,6 +219,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     cylinderForceInput.value = formatNumber(F_kgf, 2).replace(",", ".");
+    torqueResultDiv.className = "result";
     torqueResultDiv.innerHTML =
       `Força utilizada no cálculo: <b>${formatNumber(F_kgf, 2)} kgf</b> (${kind === "ext" ? "avanço" : "retorno"}).`;
   }
@@ -219,9 +229,9 @@ document.addEventListener("DOMContentLoaded", function () {
     torqueResultDiv.className = "result";
 
     const F_kgf = parsePT(cylinderForceInput.value);
-    const L_mm = parsePT(leverLengthInput.value);
-    let a0 = parsePT(angleStartInput.value);
-    let a1 = parsePT(angleEndInput.value);
+    const L_mm  = parsePT(leverLengthInput.value);
+    let a0      = parsePT(angleStartInput.value);
+    let a1      = parsePT(angleEndInput.value);
 
     if (!isFinite(F_kgf) || !isFinite(L_mm) || !isFinite(a0) || !isFinite(a1)) {
       torqueResultDiv.innerHTML = "Preencha força, braço e ângulos com valores válidos.";
@@ -239,51 +249,34 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     if (a1 < a0) {
-      const tmp = a0;
-      a0 = a1;
-      a1 = tmp;
+      const tmp = a0; a0 = a1; a1 = tmp;
     }
 
     const L_m = L_mm / 1000.0;
-    const F_N = F_kgf * 9.80665;
 
     const angles = [];
     const torques_kgfm = [];
-
-    let minTorque_kgfm = Infinity;
-    let maxTorque_kgfm = -Infinity;
-    let angleMin = a0;
-    let angleMax = a0;
 
     for (let ang = a0; ang <= a1; ang += 1) {
       const rad = ang * Math.PI / 180.0;
       const sinv = Math.sin(rad);
       const T_kgfm = F_kgf * L_m * sinv;
-
       angles.push(ang);
       torques_kgfm.push(T_kgfm);
-
-      if (T_kgfm < minTorque_kgfm) {
-        minTorque_kgfm = T_kgfm;
-        angleMin = ang;
-      }
-      if (T_kgfm > maxTorque_kgfm) {
-        maxTorque_kgfm = T_kgfm;
-        angleMax = ang;
-      }
     }
 
-    const minAbs_kgfm = Math.min(...torques_kgfm.map(v => Math.abs(v)));
-    const worstIndex = torques_kgfm.map(v => Math.abs(v)).indexOf(minAbs_kgfm);
+    const absTorques = torques_kgfm.map(v => Math.abs(v));
+    const minAbs_kgfm = Math.min(...absTorques);
+    const worstIndex = absTorques.indexOf(minAbs_kgfm);
     const worstAngle = angles[worstIndex];
     const worstTorque_kgfm = torques_kgfm[worstIndex];
-    const worstTorque_Nm = worstTorque_kgfm * 9.80665;
+    const worstTorque_Nm   = worstTorque_kgfm * 9.80665;
 
-    const maxAbs_kgfm = Math.max(...torques_kgfm.map(v => Math.abs(v)));
-    const bestIndex = torques_kgfm.map(v => Math.abs(v)).indexOf(maxAbs_kgfm);
+    const maxAbs_kgfm = Math.max(...absTorques);
+    const bestIndex = absTorques.indexOf(maxAbs_kgfm);
     const bestAngle = angles[bestIndex];
     const bestTorque_kgfm = torques_kgfm[bestIndex];
-    const bestTorque_Nm = bestTorque_kgfm * 9.80665;
+    const bestTorque_Nm   = bestTorque_kgfm * 9.80665;
 
     let html =
       `Torque mínimo (em módulo) no intervalo: <b>${formatNumber(Math.abs(worstTorque_kgfm),3)} kgf·m</b> ` +
@@ -293,7 +286,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
     torqueResultDiv.innerHTML = html;
 
-    // gráfico
     const ctx = document.getElementById("forceChart");
     if (ctx && window.Chart) {
       if (chartInstance) {
@@ -333,26 +325,26 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   if (useTableForceBtn) useTableForceBtn.addEventListener("click", useTableForce);
-  if (calcTorqueBtn) calcTorqueBtn.addEventListener("click", calculateTorque);
+  if (calcTorqueBtn)     calcTorqueBtn.addEventListener("click", calculateTorque);
 
   // ================= Dimensionar cilindro pelo torque desejado =================
-  const desiredTorqueInput = document.getElementById("desiredTorque");
-  const desiredTorqueUnitSelect = document.getElementById("desiredTorqueUnit");
-  const calcCylinderBtn = document.getElementById("calcCylinder");
-  const cylinderResultDiv = document.getElementById("cylinderResult");
+  const desiredTorqueInput       = document.getElementById("desiredTorque");
+  const desiredTorqueUnitSelect  = document.getElementById("desiredTorqueUnit");
+  const calcCylinderBtn          = document.getElementById("calcCylinder");
+  const cylinderResultDiv        = document.getElementById("cylinderResult");
 
   function calcCylinderFromTorque() {
     if (!cylinderResultDiv) return;
     cylinderResultDiv.className = "result";
 
     const T_val = parsePT(desiredTorqueInput.value);
-    const unit = desiredTorqueUnitSelect ? desiredTorqueUnitSelect.value : "kgfm";
+    const unit  = desiredTorqueUnitSelect ? desiredTorqueUnitSelect.value : "kgfm";
 
-    const L_mm = parsePT(leverLengthInput.value);
-    let a0 = parsePT(angleStartInput.value);
-    let a1 = parsePT(angleEndInput.value);
+    const L_mm  = parsePT(leverLengthInput.value);
+    let a0      = parsePT(angleStartInput.value);
+    let a1      = parsePT(angleEndInput.value);
 
-    const pBar = parsePT(pressureSelect.value);
+    const pBar  = parsePT(pressureSelect.value);
 
     if (!isFinite(T_val) || T_val <= 0) {
       cylinderResultDiv.innerHTML = "Informe um torque desejado válido.";
@@ -373,7 +365,6 @@ document.addEventListener("DOMContentLoaded", function () {
       const tmp = a0; a0 = a1; a1 = tmp;
     }
 
-    // converter torque desejado para kgf·m
     let T_req_kgfm = T_val;
     if (unit === "Nm") {
       T_req_kgfm = T_val / 9.80665;
@@ -381,7 +372,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
     const L_m = L_mm / 1000.0;
 
-    // pior caso (menor |sin|)
     const sinVals = [];
     for (let ang = a0; ang <= a1; ang += 1) {
       const rad = ang * Math.PI / 180.0;
@@ -390,14 +380,14 @@ document.addEventListener("DOMContentLoaded", function () {
     const minSin = Math.min(...sinVals);
 
     if (minSin <= 0) {
-      cylinderResultDiv.innerHTML = "O intervalo de ângulos passa por uma condição muito desfavorável (sin ≈ 0). Revise a geometria.";
+      cylinderResultDiv.innerHTML =
+        "O intervalo de ângulos passa por uma condição muito desfavorável (sin ≈ 0). Revise a geometria.";
       return;
     }
 
     const F_req_kgf = T_req_kgfm / (L_m * minSin);
-    const F_req_N = F_req_kgf * 9.80665;
+    const F_req_N   = F_req_kgf * 9.80665;
 
-    // procurar menor diâmetro que atenda à força em avanço (extensão)
     let selectedBore = null;
     let F_cyl_kgf_sel = null;
 
@@ -412,13 +402,13 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
     if (selectedBore === null) {
+      cylinderResultDiv.classList.add("result-warning");
       cylinderResultDiv.innerHTML =
         `Torque desejado: <b>${formatNumber(T_req_kgfm,3)} kgf·m</b> ` +
         `(&approx; <b>${formatNumber(T_req_kgfm * 9.80665,2)} N·m</b>)<br>` +
         `Força mínima necessária no pior ponto: <b>${formatNumber(F_req_kgf,2)} kgf</b> ` +
         `(&approx; <b>${formatNumber(F_req_N,2)} N</b>)<br><br>` +
         `Nenhum diâmetro até 320 mm atende a essa condição na pressão selecionada.`;
-      cylinderResultDiv.classList.add("result-warning");
       return;
     }
 
@@ -428,9 +418,8 @@ document.addEventListener("DOMContentLoaded", function () {
       `Força mínima necessária no pior ponto: <b>${formatNumber(F_req_kgf,2)} kgf</b> ` +
       `(&approx; <b>${formatNumber(F_req_N,2)} N</b>)<br><br>` +
       `Sugestão de cilindro (avanço): Ø <b>${selectedBore} mm</b> ` +
-      `em <b>${formatNumber(pBar,1)} bar</b>, com força de avanço ≈ <b>${formatNumber(F_cyl_kgf_sel,2)} kgf</b>.`;
-
-    html += "<br>Considere aplicar fator de segurança adicional conforme a aplicação (impactos, folgas, ciclo).";
+      `em <b>${formatNumber(pBar,1)} bar</b>, com força de avanço ≈ <b>${formatNumber(F_cyl_kgf_sel,2)} kgf</b>.<br>` +
+      `Considere aplicar fator de segurança adicional conforme a aplicação (impactos, folgas, ciclo).`;
 
     cylinderResultDiv.innerHTML = html;
   }
