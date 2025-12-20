@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8" />
-  <title>Tabela de Força do Cilindro Pneumático</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8">
+  <title>Mecalc – Cálculo de Força de Cilindros Pneumáticos</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <link rel="stylesheet" href="styles.css" />
 </head>
 
@@ -11,146 +11,164 @@
 
 <header class="top">
   <div class="wrap">
-    <h1>Tabela de Força do Cilindro Pneumático</h1>
+    <h1>Mecalc</h1>
 
-    <div class="controls">
+    <nav class="main-nav">
+      <a href="home.html">Home</a>
+      <a href="index.html" class="active">Pneumática</a>
+      <a href="transportadores.html">Transportadores</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <!-- CARD: Tabela de força dos cilindros -->
+  <section class="card">
+    <h2>Tabela de força do cilindro pneumático</h2>
+    <p style="font-size:13px; margin-top:4px;">
+      Valores em <b>kgf</b> (extensão e retorno) para diferentes diâmetros e pressões.
+    </p>
+
+    <div class="torque-grid" style="margin-top:10px; align-items:flex-end;">
       <label>
-        Cilindro (mm)
-        <select id="boreSelect"></select>
+        Ø do cilindro (mm)
+        <select id="boreSelect">
+          <!-- opções preenchidas via app.js -->
+        </select>
       </label>
 
       <label>
         Pressão (bar)
         <select id="pressure">
           <option value="">—</option>
-          <option value="2">2</option>
-          <option value="3">3</option>
-          <option value="4">4</option>
-          <option value="5">5</option>
-          <option value="6">6</option>
-          <option value="7">7</option>
-          <option value="8">8</option>
-          <option value="9">9</option>
-          <option value="10">10</option>
+          <option value="2">2 bar</option>
+          <option value="3">3 bar (interpolar 2–4)</option>
+          <option value="4">4 bar</option>
+          <option value="5">5 bar (interpolar 4–6)</option>
+          <option value="6">6 bar</option>
+          <option value="7">7 bar (interpolar 6–8)</option>
+          <option value="8">8 bar</option>
+          <option value="9">9 bar (interpolar 8–10)</option>
+          <option value="10">10 bar</option>
         </select>
       </label>
 
       <label>
-        Buscar
-        <input type="text" id="search" placeholder="ex: 32" inputmode="numeric" />
+        Buscar Ø na tabela
+        <input type="number" id="search" placeholder="ex: 32" />
       </label>
 
-      <button id="clear" type="button">Limpar</button>
+      <button type="button" id="clear">Limpar seleção</button>
     </div>
-  </div>
-</header>
 
-<main class="wrap">
+    <div style="margin-top:8px; font-size:12px; color:var(--muted);">
+      Observação: pressões intermediárias (3, 5, 7 e 9 bar) são obtidas por interpolação linear
+      entre as colunas vizinhas.
+    </div>
 
-  <!-- CARD DA TABELA -->
-  <section class="card">
-    <p class="unit-label">UNIDADE: KGF</p>
-
-    <div class="table-wrap">
+    <div style="overflow-x:auto; margin-top:12px;">
       <table id="forceTable"></table>
     </div>
-
-    <p class="note">
-      Obs.: Valores de <b>3, 5, 7 e 9 bar</b> são <b>interpolados</b> (média entre as forças das pressões vizinhas):<br>
-      3 bar → entre 2 e 4 &nbsp;•&nbsp;
-      5 bar → entre 4 e 6 &nbsp;•&nbsp;
-      7 bar → entre 6 e 8 &nbsp;•&nbsp;
-      9 bar → entre 8 e 10 bar.
-    </p>
   </section>
 
-  <!-- CARD DO TORQUE + GRÁFICO + DIMENSIONAMENTO -->
+  <!-- CARD: Cálculo de torque na alavanca -->
   <section class="card torque-card">
-    <h2>Cálculo de Torque</h2>
+    <h2>Cálculo de torque na alavanca</h2>
 
     <div class="torque-grid">
+
       <label>
-        Tipo da força
+        Tipo de força (tabela)
         <select id="forceKind">
           <option value="e">Extensão</option>
-          <option value="r">Retração</option>
+          <option value="r">Retorno</option>
         </select>
       </label>
 
+      <button type="button" id="useTableForce">
+        Usar força da tabela
+      </button>
+
       <label>
-        Força (kgf)
-        <input type="number" id="cylinderForce" placeholder="ex: 49.2" step="0.1" />
+        Força no cilindro (kgf)
+        <input type="number" id="cylinderForce" placeholder="ex: 50" step="0.1" />
       </label>
 
       <label>
-        Braço (mm)
+        Comprimento da alavanca (mm)
         <input type="number" id="leverLength" placeholder="ex: 40" step="0.1" />
       </label>
 
       <label>
-        Ângulo inicial (°)
-        <input type="number" id="angleStart" placeholder="ex: 30" min="0" max="180" step="0.1" />
+        Ângulo inicial entre cilindro e alavanca (°)
+        <input type="number" id="angleStart" placeholder="ex: 45" step="0.1" />
       </label>
 
       <label>
-        Ângulo final (°)
-        <input type="number" id="angleEnd" placeholder="ex: 120" min="0" max="180" step="0.1" />
+        Ângulo final entre cilindro e alavanca (°)
+        <input type="number" id="angleEnd" placeholder="ex: 90" step="0.1" />
+      </label>
+
+      <button type="button" id="calculateTorque">
+        Calcular torque e gráfico
+      </button>
+    </div>
+
+    <div id="torqueResult" class="result"></div>
+
+    <div style="margin-top:16px; height:260px;">
+      <canvas id="forceChart"></canvas>
+    </div>
+  </section>
+
+  <!-- CARD: Dimensionar cilindro pelo torque desejado -->
+  <section class="card">
+    <h2>Dimensionar cilindro pelo torque desejado</h2>
+
+    <p style="font-size:13px; margin-bottom:6px;">
+      Utilize o <b>mesmo braço (mm)</b> e os <b>mesmos ângulos inicial/final</b> definidos acima.
+      Informe o torque mínimo que você precisa no pior ponto do movimento.
+    </p>
+
+    <div class="torque-grid">
+      <label>
+        Torque desejado (mínimo no intervalo)
+        <input type="number" id="desiredTorque" placeholder="ex: 15" step="0.01" />
       </label>
 
       <label>
-        Unidade do torque
-        <select id="torqueUnit">
+        Unidade do torque desejado
+        <select id="desiredTorqueUnit">
           <option value="kgfm">kgf·m</option>
           <option value="Nm">N·m</option>
         </select>
       </label>
 
-      <button id="useTableForce" type="button">Usar força da tabela</button>
-      <button id="calculateTorque" type="button">Calcular torque e gerar gráfico</button>
+      <button type="button" id="calcCylinder">
+        Dimensionar cilindro
+      </button>
     </div>
 
-    <div id="torqueResult" class="result"></div>
+    <div id="cylinderResult" class="result"></div>
 
-    <div class="chart-wrapper">
-      <canvas id="forceChart"></canvas>
+    <div style="margin-top:10px; font-size:12px; color:var(--muted);">
+      Dica: para aplicações com impacto, alta ciclagem ou cargas variáveis, considere utilizar
+      fator de segurança maior, cilindro com diâmetro superior e/ou válvulas de retenção
+      pilotadas para evitar recuo da carga.
     </div>
-
-    <!-- NOVA SEÇÃO: dimensionamento do cilindro pelo torque desejado -->
-    <div class="dim-section">
-      <h3>Dimensionar cilindro pelo torque desejado</h3>
-      <p class="dim-note">
-        Usa o <b>braço</b> e os <b>ângulos inicial e final</b> informados acima,
-        junto com a <b>pressão</b> e o <b>tipo de força (Ext/Ret)</b>.<br>
-        O dimensionamento é feito pelo <b>pior ponto do intervalo</b> (menor torque disponível).
-      </p>
-
-      <div class="dim-grid">
-        <label>
-          Torque desejado
-          <input type="number" id="desiredTorque" placeholder="ex: 50" step="0.1" />
-        </label>
-
-        <label>
-          Unidade
-          <select id="desiredTorqueUnit">
-            <option value="kgfm">kgf·m</option>
-            <option value="Nm">N·m</option>
-          </select>
-        </label>
-
-        <button id="calcCylinder" type="button">Calcular cilindro mínimo</button>
-      </div>
-
-      <div id="cylinderResult" class="result"></div>
-    </div>
-
   </section>
 
 </main>
 
-<!-- Chart.js CDN -->
+<footer class="wrap" style="margin:30px 0; text-align:center; font-size:12px;">
+  © 2025 Mecalc — Ferramentas para Engenharia Mecânica
+</footer>
+
+<!-- Chart.js para o gráfico de torque x ângulo -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<!-- Lógica da tabela, torque e dimensionamento -->
 <script src="app.js"></script>
 </body>
 </html>
-
