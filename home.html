@@ -32,41 +32,38 @@
 
   <!-- HERO COM ENGRENAGEM -->
   <section class="card hero-card">
-<div class="hero-visual">
-  <div class="gear">
-    <svg viewBox="0 0 120 120" class="gear-svg">
-      <g transform="translate(60 60)">
-        
-        <!-- ANEL EXTERNO -->
-        <circle cx="0" cy="0" r="32" fill="none" stroke="currentColor" stroke-width="8" />
+    <div class="hero-visual">
+      <div class="gear">
+        <svg viewBox="0 0 120 120" class="gear-svg">
+          <g transform="translate(60 60)">
+            <!-- ANEL EXTERNO -->
+            <circle cx="0" cy="0" r="32" fill="none" stroke="currentColor" stroke-width="8" />
 
-        <!-- FURO CENTRAL -->
-        <circle cx="0" cy="0" r="14" fill="none" stroke="currentColor" stroke-width="6" />
+            <!-- FURO CENTRAL -->
+            <circle cx="0" cy="0" r="14" fill="none" stroke="currentColor" stroke-width="6" />
 
-        <!-- DENTES (12 peças, 360 / 12 = 30° cada) -->
-        <g fill="currentColor">
-          <rect x="-6" y="-50" width="12" height="16" rx="2" transform="rotate(0)"   />
-          <rect x="-6" y="-50" width="12" height="16" rx="2" transform="rotate(30)"  />
-          <rect x="-6" y="-50" width="12" height="16" rx="2" transform="rotate(60)"  />
-          <rect x="-6" y="-50" width="12" height="16" rx="2" transform="rotate(90)"  />
-          <rect x="-6" y="-50" width="12" height="16" rx="2" transform="rotate(120)" />
-          <rect x="-6" y="-50" width="12" height="16" rx="2" transform="rotate(150)" />
+            <!-- 12 DENTES -->
+            <g fill="currentColor">
+              <rect x="-6" y="-50" width="12" height="16" rx="2" transform="rotate(0)" />
+              <rect x="-6" y="-50" width="12" height="16" rx="2" transform="rotate(30)" />
+              <rect x="-6" y="-50" width="12" height="16" rx="2" transform="rotate(60)" />
+              <rect x="-6" y="-50" width="12" height="16" rx="2" transform="rotate(90)" />
+              <rect x="-6" y="-50" width="12" height="16" rx="2" transform="rotate(120)" />
+              <rect x="-6" y="-50" width="12" height="16" rx="2" transform="rotate(150)" />
+              <rect x="-6" y="-50" width="12" height="16" rx="2" transform="rotate(180)" />
+              <rect x="-6" y="-50" width="12" height="16" rx="2" transform="rotate(210)" />
+              <rect x="-6" y="-50" width="12" height="16" rx="2" transform="rotate(240)" />
+              <rect x="-6" y="-50" width="12" height="16" rx="2" transform="rotate(270)" />
+              <rect x="-6" y="-50" width="12" height="16" rx="2" transform="rotate(300)" />
+              <rect x="-6" y="-50" width="12" height="16" rx="2" transform="rotate(330)" />
+            </g>
+          </g>
+        </svg>
+      </div>
+    </div>
 
-          <rect x="-6" y="-50" width="12" height="16" rx="2" transform="rotate(180)" />
-          <rect x="-6" y="-50" width="12" height="16" rx="2" transform="rotate(210)" />
-          <rect x="-6" y="-50" width="12" height="16" rx="2" transform="rotate(240)" />
-          <rect x="-6" y="-50" width="12" height="16" rx="2" transform="rotate(270)" />
-          <rect x="-6" y="-50" width="12" height="16" rx="2" transform="rotate(300)" />
-          <rect x="-6" y="-50" width="12" height="16" rx="2" transform="rotate(330)" />
-        </g>
-
-      </g>
-    </svg>
-  </div>
-</div>
-
-    <p class="hero-text para">
-      Plataforma de cálculos para engenharia mecânica industrial, 
+    <p class="para">
+      Plataforma de cálculos para engenharia mecânica industrial,
       focada em projetos de máquinas, automação e sistemas de transporte.
     </p>
   </section>
@@ -81,7 +78,7 @@
     </p>
 
     <p class="para">
-      A ideia do projeto é oferecer uma central técnica para apoiar o dia a dia do 
+      A ideia do projeto é oferecer uma central técnica para apoiar o dia a dia do
       engenheiro, técnico e projetista, com informações rápidas e confiáveis para
       tomada de decisão.
     </p>
@@ -92,7 +89,7 @@
 
     <ul class="list">
       <li><b>Pneumática:</b> força de cilindros, torque em alavancas, gráfico por ângulo e dimensionamento de cilindros.</li>
-      <li><b>Transportadores:</b> velocidade da esteira, passo entre produtos, RPM do tambor e tempo de percurso.</li>
+      <li><b>Transportadores:</b> velocidade da esteira, passo entre produtos, RPM do tambor, torque e tempo de percurso.</li>
     </ul>
   </section>
 
@@ -142,11 +139,11 @@
     if (!span) return;
     let i = 0;
 
-    function type(){
-      if(i < text.length){
+    function type() {
+      if (i < text.length) {
         span.textContent += text.charAt(i);
         i++;
-        setTimeout(type, 80); // velocidade da digitação
+        setTimeout(type, 80);
       }
     }
 
@@ -156,6 +153,3 @@
 
 </body>
 </html>
-
-
-
