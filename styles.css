@@ -354,14 +354,27 @@ th.group{
 }
 
 /* ENGRENAGEM GIRANDO */
+/* ENGRENAGEM ANIMADA SVG */
 .gear{
   margin: 10px auto 0 auto;
   width: 80px;
   height: 80px;
-  background: url("https://i.imgur.com/aBBfFlA.png");
-  background-size: cover;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   animation: gearspin 4s linear infinite;
   filter: drop-shadow(0 0 6px #000);
+}
+
+.gear-svg{
+  width: 80px;
+  height: 80px;
+  color: #ff8080; /* cor da engrenagem */
+}
+
+@keyframes gearspin{
+  0%   { transform: rotate(0deg);   }
+  100% { transform: rotate(360deg); }
 }
 
 @keyframes gearspin{
@@ -382,5 +395,6 @@ th.group{
   margin-top: 8px;
   padding-left: 18px;
 }
+
 
 
