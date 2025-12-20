@@ -35,20 +35,25 @@
 <div class="hero-visual">
   <div class="gear" aria-hidden="true">
     <svg viewBox="0 0 100 100" class="gear-svg">
-      <circle cx="50" cy="50" r="18" fill="none" stroke="currentColor" stroke-width="6" />
+      <g transform="translate(50 50)">
+        <!-- ARCO EXTERNO DA ENGRENAGEM -->
+        <circle cx="0" cy="0" r="28" fill="none" stroke="currentColor" stroke-width="8" />
 
-      <g stroke="currentColor" stroke-width="6" stroke-linecap="round">
-        <line x1="50" y1="6"  x2="50" y2="20" />
-        <line x1="50" y1="80" x2="50" y2="94" />
+        <!-- FURO CENTRAL -->
+        <circle cx="0" cy="0" r="14" fill="none" stroke="currentColor" stroke-width="5" />
 
-        <line x1="6"  y1="50" x2="20" y2="50" />
-        <line x1="80" y1="50" x2="94" y2="50" />
+        <!-- DENTES (retângulos ao redor) -->
+        <g fill="currentColor">
+          <rect x="-5" y="-42" width="10" height="12" rx="1" />
+          <rect x="-5" y="30"  width="10" height="12" rx="1" transform="rotate(180)" />
 
-        <line x1="20" y1="20" x2="30" y2="30" />
-        <line x1="80" y1="80" x2="70" y2="70" />
-
-        <line x1="20" y1="80" x2="30" y2="70" />
-        <line x1="80" y1="20" x2="70" y2="30" />
+          <rect x="-5" y="-42" width="10" height="12" rx="1" transform="rotate(45)" />
+          <rect x="-5" y="-42" width="10" height="12" rx="1" transform="rotate(90)" />
+          <rect x="-5" y="-42" width="10" height="12" rx="1" transform="rotate(135)" />
+          <rect x="-5" y="-42" width="10" height="12" rx="1" transform="rotate(225)" />
+          <rect x="-5" y="-42" width="10" height="12" rx="1" transform="rotate(270)" />
+          <rect x="-5" y="-42" width="10" height="12" rx="1" transform="rotate(315)" />
+        </g>
       </g>
     </svg>
   </div>
@@ -145,4 +150,5 @@
 
 </body>
 </html>
+
 
