@@ -147,20 +147,18 @@ document.addEventListener("DOMContentLoaded", function () {
   const btnClearTorque  = document.getElementById("clearTorqueConv");
   const torqueConvResult= document.getElementById("torqueConvResult");
 
-  // Quando o usuário escolhe um tipo de atrito na tabela
+  // Preenche μ a partir da tabela
   if (frictionPreset) {
     frictionPreset.addEventListener("change", function () {
       if (!friction) return;
       const val = frictionPreset.value;
 
       if (val === "" || val === "custom") {
-        // Deixa o campo livre para edição manual
         friction.value = "";
         friction.removeAttribute("readonly");
       } else {
-        // Preenche o μ da tabela; se quiser travar o campo, descomente a linha de readonly
-        friction.value = val;
-        // friction.setAttribute("readonly", "readonly");
+        friction.value = val; // ex: "0.45"
+        // se quiser travar o campo: friction.setAttribute("readonly", "readonly");
       }
     });
   }
@@ -168,9 +166,9 @@ document.addEventListener("DOMContentLoaded", function () {
   function calcTorqueConv() {
     torqueConvResult.innerHTML = "";
 
-    const m   = parsePT(massKg.value);
-    const Dmm = parsePT(torqueDiameter.value);
-    const mu  = parsePT(friction.value);
+    const m   = parsePT(massKg.value);          // kg
+    const Dmm = parsePT(torqueDiameter.value);  // mm
+    const mu  = parsePT(friction.value);        // coeficiente
 
     if (!isFinite(m) || !isFinite(Dmm) || !isFinite(mu)) {
       torqueConvResult.innerHTML = "Informe massa, diâmetro e coeficiente de atrito válidos.";
@@ -178,15 +176,15 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     if (m <= 0 || Dmm <= 0 || mu <= 0) {
-      torqueConvResult.innerHTML = "Os valores devem ser positivos.";
+      torqueConvResult.innerHTML = "Os valores devem ser maiores que zero.";
       return;
     }
 
-    const g  = 9.81;           // m/s²
-    const F  = m * g * mu;     // N – força tangencial
-    const D  = Dmm / 1000.0;   // mm → m
-    const T  = (F * D) / 2.0;  // N·m – torque no eixo
-    const kgfm = T / 9.80665;  // conversão aproximada p/ kgf·m
+    const g    = 9.81;            // m/s²
+    const F    = m * g * mu;      // N (força tangencial)
+    const D    = Dmm / 1000.0;    // m (diâmetro)
+    const T    = (F * D) / 2.0;   // N·m (torque)
+    const kgfm = T / 9.80665;     // kgf·m
 
     let html =
       `Força tangencial estimada (F): <b>${formatNumber(F,2)} N</b><br>` +
