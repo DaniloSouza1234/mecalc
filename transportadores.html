@@ -23,7 +23,7 @@
 
 <main class="wrap">
 
-  <!-- CARD 1: Velocidade a partir da produção -->
+  <!-- CARD 1: Velocidade da esteira a partir da produção -->
   <section class="card">
     <h2>Velocidade da esteira a partir da produção</h2>
 
@@ -80,6 +80,70 @@
     </div>
 
     <div id="convResult" class="result"></div>
+  </section>
+
+  <!-- CARD 3: Torque no tambor do transportador -->
+  <section class="card torque-card">
+    <h2>Torque no tambor do transportador</h2>
+
+    <div class="torque-grid">
+
+      <label>
+        Massa total transportada (kg)
+        <input type="number" id="massKg" placeholder="ex: 80" step="0.1" />
+      </label>
+
+      <label>
+        Diâmetro do tambor (mm)
+        <input type="number" id="torqueDiameter" placeholder="ex: 100" step="0.1" />
+      </label>
+
+      <label>
+        Tipo de contato / atrito
+        <select id="frictionPreset">
+          <option value="">Selecionar atrito…</option>
+
+          <optgroup label="Aço / Aço">
+            <option value="0.60">Aço-aço estático seco (μ = 0,60)</option>
+            <option value="0.50">Aço-aço deslizante seco (μ = 0,50)</option>
+            <option value="0.35">Aço-aço estático lubrificado (μ = 0,35)</option>
+            <option value="0.25">Aço-aço deslizante lubrificado (μ = 0,25)</option>
+          </optgroup>
+
+          <optgroup label="Madeira / Aço">
+            <option value="0.75">Madeira-aço estático (μ = 0,75)</option>
+            <option value="0.60">Madeira-aço deslizante (μ = 0,60)</option>
+          </optgroup>
+
+          <optgroup label="Madeira / Madeira">
+            <option value="0.75">Madeira-madeira estático (μ = 0,75)</option>
+            <option value="0.50">Madeira-madeira deslizante (μ = 0,50)</option>
+          </optgroup>
+
+          <optgroup label="Plástico / Aço">
+            <option value="0.45">Plástico-aço estático (μ = 0,45)</option>
+            <option value="0.25">Plástico-aço deslizante (μ = 0,25)</option>
+          </optgroup>
+
+          <optgroup label="Aço / Plástico">
+            <option value="0.45">Aço-plástico estático (μ = 0,45)</option>
+            <option value="0.35">Aço-plástico deslizante (μ = 0,35)</option>
+          </optgroup>
+
+          <option value="custom">Outro (informar manualmente)</option>
+        </select>
+      </label>
+
+      <label>
+        Coeficiente de atrito (μ)
+        <input type="number" id="friction" placeholder="ex: 0.12" step="0.01" />
+      </label>
+
+      <button type="button" id="calcTorqueConv">Calcular torque</button>
+      <button type="button" id="clearTorqueConv">Limpar</button>
+    </div>
+
+    <div id="torqueConvResult" class="result"></div>
   </section>
 
 </main>
