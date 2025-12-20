@@ -1,6 +1,6 @@
 document.addEventListener("DOMContentLoaded", function () {
 
-  // --------- Helpers gerais ---------
+  // Helpers
   function parsePT(v) {
     if (v == null) return NaN;
     const s = String(v).trim().replace(",", ".");
@@ -44,20 +44,14 @@ document.addEventListener("DOMContentLoaded", function () {
       return;
     }
 
-    // Passo entre produtos (mm)
-    const passo = Lp + G;
+    const passo = Lp + G; // mm
 
-    // Velocidade em m/min: Q * passo (mm/min) / 1000
-    const v_mpm = (Q * passo) / 1000.0;
-    // Velocidade em m/s
-    const v_ms  = v_mpm / 60.0;
+    const v_mpm = (Q * passo) / 1000.0; // m/min
+    const v_ms  = v_mpm / 60.0;         // m/s
 
-    // Circunferência do tambor (m)
-    const circ_m = Math.PI * (Dmm / 1000.0);
-    // RPM do tambor
+    const circ_m = Math.PI * (Dmm / 1000.0); // m
     const rpm = v_mpm / circ_m;
 
-    // Tempo de percurso
     const t_s = v_ms > 0 ? (Lm / v_ms) : NaN;
 
     let html =
@@ -74,6 +68,9 @@ document.addEventListener("DOMContentLoaded", function () {
       html +=
         "<br><br>⚠ <b>Atenção:</b> velocidade relativamente alta. " +
         "Verifique amortecimento em batentes, sensores e estabilidade do produto.";
+      transportRes.className = "result result-warning";
+    } else {
+      transportRes.className = "result";
     }
 
     transportRes.innerHTML = html;
@@ -86,6 +83,7 @@ document.addEventListener("DOMContentLoaded", function () {
     drumDiameter.value = "";
     beltLength.value   = "";
     transportRes.innerHTML = "";
+    transportRes.className = "result";
   }
 
   if (btnCalcTrans)  btnCalcTrans.addEventListener("click", calcTransport);
@@ -103,6 +101,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
   function calcConv() {
     convRes.innerHTML = "";
+    convRes.className = "result";
 
     const Dmm = parsePT(convDrumDiameter.value);
     const rpm = parsePT(convRpm.value);
@@ -130,6 +129,7 @@ document.addEventListener("DOMContentLoaded", function () {
     convDrumDiameter.value = "";
     convRpm.value          = "";
     convRes.innerHTML      = "";
+    convRes.className      = "result";
   }
 
   if (btnCalcConv)  btnCalcConv.addEventListener("click", calcConv);
@@ -165,6 +165,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
   function calcTorqueConv() {
     torqueConvResult.innerHTML = "";
+    torqueConvResult.className = "result";
 
     const m   = parsePT(massKg.value);          // kg
     const Dmm = parsePT(torqueDiameter.value);  // mm
@@ -183,7 +184,8 @@ document.addEventListener("DOMContentLoaded", function () {
     const g    = 9.81;            // m/s²
     const F    = m * g * mu;      // N (força tangencial)
     const D    = Dmm / 1000.0;    // m (diâmetro)
-    const T    = (F * D) / 2.0;   // N·m (torque)
+    const r    = D / 2.0;         // m
+    const T    = F * r;           // N·m (torque)
     const kgfm = T / 9.80665;     // kgf·m
 
     let html =
@@ -195,6 +197,7 @@ document.addEventListener("DOMContentLoaded", function () {
       html +=
         "<br><br>⚠ <b>Atenção:</b> coeficiente de atrito elevado. " +
         "Verifique perdas mecânicas, aquecimento e esforço extra na correia.";
+      torqueConvResult.classList.add("result-warning");
     }
 
     torqueConvResult.innerHTML = html;
@@ -206,6 +209,7 @@ document.addEventListener("DOMContentLoaded", function () {
     friction.value       = "";
     if (frictionPreset) frictionPreset.value = "";
     torqueConvResult.innerHTML = "";
+    torqueConvResult.className = "result";
   }
 
   if (btnCalcTorque)  btnCalcTorque.addEventListener("click", calcTorqueConv);
