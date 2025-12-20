@@ -17,7 +17,7 @@ document.addEventListener("DOMContentLoaded", function () {
   // Pressões base para cálculo direto:
   const pressuresBase = [2, 4, 6, 8, 10];
 
-  // Pressões exibidas na tabela (todas de 2 até 10):
+  // Pressões exibidas na tabela (2 a 10):
   const pressuresDisplay = [2, 3, 4, 5, 6, 7, 8, 9, 10];
 
   // força em kgf para cada diâmetro e pressão base
@@ -118,18 +118,21 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
 
+  // >>> FUNÇÃO ATUALIZADA <<<
   function highlightSelection() {
     if (!forceTable) return;
     const boreVal = Number(boreSelect.value);
     const pVal = Number(pressureSelect.value || 0);
 
-    // limpar destaques
+    // limpar destaques antigos
     forceTable.querySelectorAll("tr.highlight-row")
       .forEach(tr => tr.classList.remove("highlight-row"));
     forceTable.querySelectorAll("th.highlight-pressure")
       .forEach(th => th.classList.remove("highlight-pressure"));
+    forceTable.querySelectorAll("td.highlight-cell")
+      .forEach(td => td.classList.remove("highlight-cell"));
 
-    // linha (diâmetro)
+    // destacar linha (diâmetro)
     if (boreVal) {
       const rows = forceTable.querySelectorAll("tbody tr");
       rows.forEach(tr => {
@@ -138,13 +141,21 @@ document.addEventListener("DOMContentLoaded", function () {
       });
     }
 
-    // coluna (pressão exata escolhida)
+    // destacar coluna (pressão)
     if (pVal) {
       const ths = forceTable.querySelectorAll("thead th[data-pressure]");
       ths.forEach(th => {
         const ph = Number(th.getAttribute("data-pressure"));
         if (ph === pVal) th.classList.add("highlight-pressure");
       });
+    }
+
+    // destacar célula (diâmetro + pressão)
+    if (boreVal && pVal && pressuresDisplay.includes(pVal)) {
+      const colIndex = pressuresDisplay.indexOf(pVal) + 2; // +1 por ser 0-based, +1 pela coluna Ø
+      const selector = `tbody tr[data-bore="${boreVal}"] td:nth-child(${colIndex})`;
+      const cell = forceTable.querySelector(selector);
+      if (cell) cell.classList.add("highlight-cell");
     }
   }
 
@@ -183,6 +194,8 @@ document.addEventListener("DOMContentLoaded", function () {
             .forEach(tr => tr.classList.remove("highlight-row"));
           forceTable.querySelectorAll("th.highlight-pressure")
             .forEach(th => th.classList.remove("highlight-pressure"));
+          forceTable.querySelectorAll("td.highlight-cell")
+            .forEach(td => td.classList.remove("highlight-cell"));
         }
       });
     }
@@ -208,12 +221,14 @@ document.addEventListener("DOMContentLoaded", function () {
     const kind = forceKindSelect.value === "r" ? "ret" : "ext";
 
     if (!d || !p) {
+      torqueResultDiv.className = "result";
       torqueResultDiv.innerHTML = "Selecione um diâmetro e uma pressão na tabela antes de usar esta função.";
       return;
     }
 
     const F_kgf = getInterpolatedForce(d, p, kind);
     if (!isFinite(F_kgf)) {
+      torqueResultDiv.className = "result";
       torqueResultDiv.innerHTML = "Não foi possível obter a força para os parâmetros informados.";
       return;
     }
