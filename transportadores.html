@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <title>Mecalc – Cálculos para Transportadores</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+
+<body>
+
+<header class="top">
+  <div class="wrap">
+    <h1>Mecalc</h1>
+
+    <nav class="main-nav">
+      <a href="home.html">Home</a>
+      <a href="index.html">Pneumática</a>
+      <a href="transportadores.html" class="active">Transportadores</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <!-- CARD 1: Velocidade a partir da produção -->
+  <section class="card">
+    <h2>Velocidade da esteira a partir da produção</h2>
+
+    <div class="torque-grid">
+      <label>
+        Comprimento do produto (mm)
+        <input type="number" id="prodLength" placeholder="ex: 320" step="0.1" />
+      </label>
+
+      <label>
+        Espaçamento livre entre produtos (mm)
+        <input type="number" id="gap" placeholder="ex: 600" step="0.1" />
+      </label>
+
+      <label>
+        Produção desejada (peças/min)
+        <input type="number" id="rate" placeholder="ex: 25" step="0.1" />
+      </label>
+
+      <label>
+        Diâmetro do tambor motriz (mm)
+        <input type="number" id="drumDiameter" placeholder="ex: 80" step="0.1" />
+      </label>
+
+      <label>
+        Comprimento da esteira (m)
+        <input type="number" id="beltLength" placeholder="ex: 3" step="0.1" />
+      </label>
+
+      <button type="button" id="calcTransport">Calcular velocidade</button>
+      <button type="button" id="clearTransport">Limpar</button>
+    </div>
+
+    <div id="transportResult" class="result"></div>
+  </section>
+
+  <!-- CARD 2: RPM -> Velocidade -->
+  <section class="card torque-card">
+    <h2>RPM do tambor → velocidade da esteira</h2>
+
+    <div class="torque-grid">
+      <label>
+        Diâmetro do tambor (mm)
+        <input type="number" id="convDrumDiameter" placeholder="ex: 80" step="0.1" />
+      </label>
+
+      <label>
+        RPM do tambor
+        <input type="number" id="convRpm" placeholder="ex: 30" step="0.1" />
+      </label>
+
+      <button type="button" id="calcConv">Calcular velocidade</button>
+      <button type="button" id="clearConv">Limpar</button>
+    </div>
+
+    <div id="convResult" class="result"></div>
+  </section>
+
+</main>
+
+<footer class="wrap" style="margin:30px 0; text-align:center; font-size:12px;">
+  © 2025 Mecalc — Ferramentas para Engenharia Mecânica
+</footer>
+
+<script src="transportadores.js"></script>
+</body>
+</html>
