@@ -45,7 +45,7 @@ body {
   margin: 0;
 }
 
-/* TÍTULO GERAL */
+/* TÍTULOS */
 h1, h2, h3 {
   color: var(--title);
 }
@@ -56,7 +56,7 @@ h1, h2, h3 {
   margin: 0 0 6px 0;
 }
 
-/* NAV (abas) */
+/* NAV */
 .main-nav {
   margin-top: 8px;
   display: flex;
@@ -95,7 +95,7 @@ h1, h2, h3 {
   box-shadow: 0 0 14px rgba(0, 0, 0, 0.6);
 }
 
-/* GRID DE CAMPOS (usado em Pneumática e Transportadores) */
+/* GRID DE CAMPOS */
 .torque-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
@@ -144,7 +144,7 @@ h1, h2, h3 {
   background: var(--button-hover);
 }
 
-/* RESULTADOS – destaque unificado */
+/* RESULTADOS */
 .result {
   margin-top: 10px;
   padding: 10px 12px;
@@ -165,7 +165,7 @@ h1, h2, h3 {
   background: #191000;
 }
 
-/* TEXTOS DA HOME E LISTAS */
+/* TEXTOS / LISTAS */
 .para {
   font-size: 14px;
   line-height: 1.7;
@@ -179,7 +179,7 @@ h1, h2, h3 {
   padding-left: 18px;
 }
 
-/* TÍTULO HOME COM TEXTO DIGITANDO */
+/* HOME: título + typing */
 .site-title {
   font-size: 26px;
   font-weight: 800;
@@ -195,7 +195,7 @@ h1, h2, h3 {
   color: var(--muted);
 }
 
-/* HERO DA HOME + ENGRENAGEM */
+/* HERO HOME + ENGRENAGEM */
 .hero-card {
   display: flex;
   flex-direction: column;
@@ -208,7 +208,6 @@ h1, h2, h3 {
   margin-bottom: 10px;
 }
 
-/* ENGRENAGEM SVG ANIMADA */
 .gear {
   margin: 10px auto 0 auto;
   width: 80px;
@@ -223,7 +222,7 @@ h1, h2, h3 {
 .gear-svg {
   width: 80px;
   height: 80px;
-  color: #ff8080; /* cor da engrenagem */
+  color: #ff8080;
 }
 
 @keyframes gearspin {
@@ -231,7 +230,7 @@ h1, h2, h3 {
   100% { transform: rotate(360deg); }
 }
 
-/* TABELA DE FORÇA – Pneumática */
+/* TABELA PNEUMÁTICA */
 #forceTable {
   width: 100%;
   border-collapse: collapse;
@@ -255,13 +254,20 @@ h1, h2, h3 {
   background: rgba(255, 255, 255, 0.01);
 }
 
-/* Destaque linha / pressão selecionada */
+/* Destaque linha / coluna */
 #forceTable tr.highlight-row td {
   background: #241018;
 }
 
 #forceTable th.highlight-pressure {
   background: #2a1215;
+}
+
+/* CÉLULA SELECIONADA (avanço/retorno) */
+#forceTable td.highlight-cell {
+  background: #b30024 !important;
+  color: #ffffff !important;
+  font-weight: 700;
 }
 
 /* RESPONSIVO */
