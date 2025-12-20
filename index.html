@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <title>Tabela de Força do Cilindro Pneumático</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+
+<body>
+
+<header class="top">
+  <div class="wrap">
+    <h1>Tabela de Força do Cilindro Pneumático</h1>
+
+    <div class="controls">
+      <label>
+        Cilindro (mm)
+        <select id="boreSelect"></select>
+      </label>
+
+      <label>
+        Pressão (bar)
+        <select id="pressure">
+          <option value="">—</option>
+          <option value="2">2</option>
+          <option value="3">3</option>
+          <option value="4">4</option>
+          <option value="5">5</option>
+          <option value="6">6</option>
+          <option value="7">7</option>
+          <option value="8">8</option>
+          <option value="9">9</option>
+          <option value="10">10</option>
+        </select>
+      </label>
+
+      <label>
+        Buscar
+        <input type="text" id="search" placeholder="ex: 32" inputmode="numeric" />
+      </label>
+
+      <button id="clear" type="button">Limpar</button>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <!-- CARD DA TABELA -->
+  <section class="card">
+    <p class="unit-label">UNIDADE: KGF</p>
+
+    <div class="table-wrap">
+      <table id="forceTable"></table>
+    </div>
+
+    <p class="note">
+      Obs.: Valores de <b>3, 5, 7 e 9 bar</b> são <b>interpolados</b> (média entre as forças das pressões vizinhas):<br>
+      3 bar → entre 2 e 4 &nbsp;•&nbsp;
+      5 bar → entre 4 e 6 &nbsp;•&nbsp;
+      7 bar → entre 6 e 8 &nbsp;•&nbsp;
+      9 bar → entre 8 e 10 bar.
+    </p>
+  </section>
+
+  <!-- CARD DO TORQUE + GRÁFICO + DIMENSIONAMENTO -->
+  <section class="card torque-card">
+    <h2>Cálculo de Torque</h2>
+
+    <div class="torque-grid">
+      <label>
+        Tipo da força
+        <select id="forceKind">
+          <option value="e">Extensão</option>
+          <option value="r">Retração</option>
+        </select>
+      </label>
+
+      <label>
+        Força (kgf)
+        <input type="number" id="cylinderForce" placeholder="ex: 49.2" step="0.1" />
+      </label>
+
+      <label>
+        Braço (mm)
+        <input type="number" id="leverLength" placeholder="ex: 40" step="0.1" />
+      </label>
+
+      <label>
+        Ângulo inicial (°)
+        <input type="number" id="angleStart" placeholder="ex: 30" min="0" max="180" step="0.1" />
+      </label>
+
+      <label>
+        Ângulo final (°)
+        <input type="number" id="angleEnd" placeholder="ex: 120" min="0" max="180" step="0.1" />
+      </label>
+
+      <label>
+        Unidade do torque
+        <select id="torqueUnit">
+          <option value="kgfm">kgf·m</option>
+          <option value="Nm">N·m</option>
+        </select>
+      </label>
+
+      <button id="useTableForce" type="button">Usar força da tabela</button>
+      <button id="calculateTorque" type="button">Calcular torque e gerar gráfico</button>
+    </div>
+
+    <div id="torqueResult" class="result"></div>
+
+    <div class="chart-wrapper">
+      <canvas id="forceChart"></canvas>
+    </div>
+
+    <!-- NOVA SEÇÃO: dimensionamento do cilindro pelo torque desejado -->
+    <div class="dim-section">
+      <h3>Dimensionar cilindro pelo torque desejado</h3>
+      <p class="dim-note">
+        Usa o <b>braço</b> e os <b>ângulos inicial e final</b> informados acima,
+        junto com a <b>pressão</b> e o <b>tipo de força (Ext/Ret)</b>.<br>
+        O dimensionamento é feito pelo <b>pior ponto do intervalo</b> (menor torque disponível).
+      </p>
+
+      <div class="dim-grid">
+        <label>
+          Torque desejado
+          <input type="number" id="desiredTorque" placeholder="ex: 50" step="0.1" />
+        </label>
+
+        <label>
+          Unidade
+          <select id="desiredTorqueUnit">
+            <option value="kgfm">kgf·m</option>
+            <option value="Nm">N·m</option>
+          </select>
+        </label>
+
+        <button id="calcCylinder" type="button">Calcular cilindro mínimo</button>
+      </div>
+
+      <div id="cylinderResult" class="result"></div>
+    </div>
+
+  </section>
+
+</main>
+
+<!-- Chart.js CDN -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
+
