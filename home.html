@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Mecalc – Ferramentas de Engenharia Mecânica</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+
+<body>
+
+<header class="top">
+  <div class="wrap">
+
+    <!-- TÍTULO + TEXTO DIGITANDO -->
+    <h1 class="site-title">
+      Mecalc
+      <span id="typing"></span>
+    </h1>
+
+    <!-- MENU PRINCIPAL -->
+    <nav class="main-nav">
+      <a href="home.html" class="active">Home</a>
+      <a href="index.html">Pneumática</a>
+      <a href="transportadores.html">Transportadores</a>
+    </nav>
+
+  </div>
+</header>
+
+<main class="wrap">
+
+  <!-- BLOCO DA ENGRENAGEM ANIMADA -->
+  <section class="card hero-card">
+    <div class="hero-visual">
+      <div class="gear"></div>
+    </div>
+
+    <p class="hero-text">
+      Plataforma de cálculos para engenharia mecânica industrial, 
+      focada em projetos de máquinas, automação e sistemas de transporte.
+    </p>
+  </section>
+
+  <section class="card">
+    <h2>O que é o Mecalc?</h2>
+
+    <p class="para">
+      O Mecalc é uma plataforma online de cálculo aplicada à engenharia mecânica industrial.
+      Reúne ferramentas práticas para análise de força, dimensionamento de mecanismos,
+      cálculo de transportadores, torque em alavancas e muito mais.
+    </p>
+
+    <p class="para">
+      A ideia do projeto é oferecer uma central técnica para apoiar o dia a dia do 
+      engenheiro, técnico e projetista, com informações rápidas e confiáveis para
+      tomada de decisão.
+    </p>
+  </section>
+
+  <section class="card">
+    <h2>Ferramentas disponíveis</h2>
+
+    <ul class="list">
+      <li><b>Pneumática:</b> força de cilindros, torque em alavancas, gráfico por ângulo e dimensionamento de cilindros.</li>
+      <li><b>Transportadores:</b> velocidade da esteira, passo entre produtos, RPM do tambor e tempo de percurso.</li>
+    </ul>
+  </section>
+
+  <section class="card">
+    <h2>Por que usar o Mecalc?</h2>
+
+    <ul class="list">
+      <li>Focado em aplicações reais de indústria.</li>
+      <li>Cálculos padronizados e consistentes.</li>
+      <li>Interface simples e direta para uso diário.</li>
+      <li>Base para expansão com novos módulos mecânicos.</li>
+    </ul>
+  </section>
+
+  <section class="card">
+    <h2>Próximos módulos planejados</h2>
+
+    <ul class="list">
+      <li>Motoredutores e transmissões.</li>
+      <li>Estruturas metálicas e perfis.</li>
+      <li>Dinâmica de mecanismos e movimento.</li>
+      <li>Outras ferramentas voltadas a máquinas industriais.</li>
+    </ul>
+  </section>
+
+  <section class="card">
+    <h2>Sobre o projeto</h2>
+
+    <p class="para">
+      O Mecalc é desenvolvido com foco em máquinas industriais, automação, linhas de embalagem,
+      transportadores e mecanismos em geral — servindo como apoio rápido para decisões de projeto,
+      ajustes de máquinas e validação de conceitos.
+    </p>
+  </section>
+
+</main>
+
+<footer class="wrap" style="margin:30px 0; text-align:center; font-size:12px;">
+  © 2025 Mecalc — Ferramentas para Engenharia Mecânica
+</footer>
+
+<!-- SCRIPT DO EFEITO "DIGITANDO" NO TÍTULO -->
+<script>
+  const text = " – Ferramentas de Engenharia Mecânica";
+  let i = 0;
+
+  function type(){
+    const span = document.getElementById("typing");
+    if(!span) return;
+    if(i < text.length){
+      span.innerHTML += text.charAt(i);
+      i++;
+      setTimeout(type, 70); // velocidade da digitação
+    }
+  }
+
+  document.addEventListener("DOMContentLoaded", type);
+</script>
+
+</body>
+</html>
