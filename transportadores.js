@@ -12,7 +12,7 @@ document.addEventListener("DOMContentLoaded", function () {
     return Number(v).toFixed(dec).replace(".", ",");
   }
 
-  // ======== Torques no tambor ========
+  // ======== TORQUE NO TAMBOR ========
   const massaTransportadaInput = document.getElementById("massaTransportada");
   const diametroTamborInput   = document.getElementById("diametroTambor");
   const tipoContatoAtritoSel  = document.getElementById("tipoContatoAtrito");
@@ -68,13 +68,16 @@ document.addEventListener("DOMContentLoaded", function () {
     if (diametroTamborInput)   diametroTamborInput.value   = "";
     if (tipoContatoAtritoSel)  tipoContatoAtritoSel.value  = "";
     if (coefAtritoInput)       coefAtritoInput.value       = "";
-    if (resultadoTorqueDiv)    resultadoTorqueDiv.innerHTML = "";
+    if (resultadoTorqueDiv) {
+      resultadoTorqueDiv.className = "result";
+      resultadoTorqueDiv.innerHTML = "";
+    }
   }
 
   if (calcTorqueBtn)  calcTorqueBtn.addEventListener("click", calcularTorqueTambor);
   if (limparTorqueBtn)limparTorqueBtn.addEventListener("click", limparTorqueTambor);
 
-  // ======== Potência do transportador ========
+  // ======== POTÊNCIA DO TRANSPORTADOR ========
   const massaPotenciaInput      = document.getElementById("massaPotencia");
   const tipoTransportadorSelect = document.getElementById("tipoTransportador");
   const anguloTransportadorInput= document.getElementById("anguloTransportador");
@@ -212,15 +215,15 @@ document.addEventListener("DOMContentLoaded", function () {
       `Este motor fornece cerca de <b>${formatNumber(percTotal,1)}%</b> da potência mínima calculada ` +
       `(margem ≈ <b>${formatNumber(marginPct,1)}%</b> acima do mínimo).`;
 
-    // Se a margem for baixa, destacar em amarelo
     if (marginPct < 20) {
       resultadoPotenciaDiv.classList.add("result-warning");
       html +=
         "<br><br>⚠ <b>Atenção:</b> margem de segurança baixa. " +
         "Considere um motor de potência superior ou revisar massa, atrito e rendimento.";
     } else {
-      html +=
+      resultadoPotenciaDiv.innerHTML = html +
         "<br>Considere ainda fatores de serviço adicionais conforme ciclos, partidas frequentes e impactos.";
+      return;
     }
 
     resultadoPotenciaDiv.innerHTML = html;
@@ -243,5 +246,119 @@ document.addEventListener("DOMContentLoaded", function () {
 
   if (calcPotenciaBtn)  calcPotenciaBtn.addEventListener("click", calcularPotenciaTransportador);
   if (limparPotenciaBtn)limparPotenciaBtn.addEventListener("click", limparPotenciaTransportador);
+
+  // ======== VELOCIDADE E ESPAÇAMENTO DE PRODUTOS ========
+  const prodComprimentoInput       = document.getElementById("prodComprimento");
+  const prodEspacamentoInput       = document.getElementById("prodEspacamento");
+  const modoVelocidadeSelect       = document.getElementById("modoVelocidade");
+  const velocEsteiraWrapper        = document.getElementById("velocEsteiraWrapper");
+  const capacidadeDesejadaWrapper  = document.getElementById("capacidadeDesejadaWrapper");
+  const velocEsteiraInput          = document.getElementById("velocEsteira");
+  const capacidadeDesejadaInput    = document.getElementById("capacidadeDesejada");
+  const calcVelocidadeBtn          = document.getElementById("calcularVelocidadeProdutos");
+  const limparVelocidadeBtn        = document.getElementById("limparVelocidadeProdutos");
+  const resultadoVelocidadeDiv     = document.getElementById("resultadoVelocidadeProdutos");
+
+  function atualizarModoVelocidade() {
+    if (!modoVelocidadeSelect) return;
+    const modo = modoVelocidadeSelect.value;
+    if (!velocEsteiraWrapper || !capacidadeDesejadaWrapper) return;
+
+    if (modo === "capacidade") {
+      velocEsteiraWrapper.style.display       = "";
+      capacidadeDesejadaWrapper.style.display = "none";
+      if (capacidadeDesejadaInput) capacidadeDesejadaInput.value = "";
+    } else {
+      velocEsteiraWrapper.style.display       = "none";
+      capacidadeDesejadaWrapper.style.display = "";
+      if (velocEsteiraInput) velocEsteiraInput.value = "";
+    }
+  }
+
+  if (modoVelocidadeSelect) {
+    modoVelocidadeSelect.addEventListener("change", atualizarModoVelocidade);
+    atualizarModoVelocidade();
+  }
+
+  function calcularVelocidadeProdutos() {
+    if (!resultadoVelocidadeDiv) return;
+    resultadoVelocidadeDiv.className = "result";
+
+    const Lmm = parsePT(prodComprimentoInput.value);
+    const Gmm = parsePT(prodEspacamentoInput.value);
+
+    if (!isFinite(Lmm) || Lmm <= 0 || !isFinite(Gmm) || Gmm < 0) {
+      resultadoVelocidadeDiv.innerHTML =
+        "Informe comprimento do produto (> 0) e espaçamento (≥ 0) em mm.";
+      return;
+    }
+
+    const passo_m = (Lmm + Gmm) / 1000.0; // passo total entre frentes (m)
+
+    if (passo_m <= 0) {
+      resultadoVelocidadeDiv.innerHTML = "Passo total inválido. Verifique comprimento e espaçamento.";
+      return;
+    }
+
+    const modo = modoVelocidadeSelect ? modoVelocidadeSelect.value : "capacidade";
+
+    if (modo === "capacidade") {
+      const v_mmin = parsePT(velocEsteiraInput.value);
+      if (!isFinite(v_mmin) || v_mmin <= 0) {
+        resultadoVelocidadeDiv.innerHTML =
+          "Informe a velocidade da esteira em m/min (maior que zero).";
+        return;
+      }
+
+      const PPM = v_mmin / passo_m;       // produtos/min
+      const tempoEntre_s = 60.0 / PPM;    // s entre entradas
+      const v_ms = v_mmin / 60.0;
+
+      let html =
+        `Passo total (produto + espaçamento): <b>${formatNumber(passo_m,3)} m</b>.<br>` +
+        `Velocidade da esteira: <b>${formatNumber(v_ms,3)} m/s</b> ` +
+        `(≈ <b>${formatNumber(v_mmin,1)} m/min</b>).<br>` +
+        `Capacidade aproximada: <b>${formatNumber(PPM,1)} produtos/min</b>.<br>` +
+        `Tempo entre produtos: <b>${formatNumber(tempoEntre_s,2)} s</b>.`;
+
+      resultadoVelocidadeDiv.innerHTML = html;
+    } else {
+      const PPM = parsePT(capacidadeDesejadaInput.value);
+      if (!isFinite(PPM) || PPM <= 0) {
+        resultadoVelocidadeDiv.innerHTML =
+          "Informe uma capacidade desejada em produtos/min (maior que zero).";
+        return;
+      }
+
+      const v_mmin = PPM * passo_m;
+      const v_ms   = v_mmin / 60.0;
+      const tempoEntre_s = 60.0 / PPM;
+
+      let html =
+        `Passo total (produto + espaçamento): <b>${formatNumber(passo_m,3)} m</b>.<br>` +
+        `Capacidade desejada: <b>${formatNumber(PPM,1)} produtos/min</b>.<br>` +
+        `Velocidade necessária da esteira: <b>${formatNumber(v_ms,3)} m/s</b> ` +
+        `(≈ <b>${formatNumber(v_mmin,1)} m/min</b>).<br>` +
+        `Tempo entre produtos: <b>${formatNumber(tempoEntre_s,2)} s</b>.`;
+
+      resultadoVelocidadeDiv.innerHTML = html;
+    }
+  }
+
+  function limparVelocidadeProdutos() {
+    if (prodComprimentoInput)      prodComprimentoInput.value = "";
+    if (prodEspacamentoInput)      prodEspacamentoInput.value = "";
+    if (modoVelocidadeSelect)      modoVelocidadeSelect.value = "capacidade";
+    if (velocEsteiraInput)         velocEsteiraInput.value = "";
+    if (capacidadeDesejadaInput)   capacidadeDesejadaInput.value = "";
+    if (resultadoVelocidadeDiv) {
+      resultadoVelocidadeDiv.className = "result";
+      resultadoVelocidadeDiv.innerHTML = "";
+    }
+    atualizarModoVelocidade();
+  }
+
+  if (calcVelocidadeBtn)  calcVelocidadeBtn.addEventListener("click", calcularVelocidadeProdutos);
+  if (limparVelocidadeBtn)limparVelocidadeBtn.addEventListener("click", limparVelocidadeProdutos);
 
 });
