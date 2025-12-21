@@ -130,6 +130,52 @@
     </p>
   </section>
 
+  <!-- CARD 3 – VELOCIDADE E ESPAÇAMENTO DE PRODUTOS -->
+  <section class="card">
+    <h2>Velocidade e espaçamento de produtos</h2>
+
+    <p class="para" style="margin-bottom:6px;">
+      Calcule a <b>capacidade em produtos/min</b> a partir da velocidade, ou descubra
+      a <b>velocidade necessária</b> para uma capacidade desejada, considerando
+      comprimento do produto e espaçamento entre itens.
+    </p>
+
+    <div class="torque-grid">
+      <label>
+        Comprimento do produto (mm)
+        <input type="number" id="prodComprimento" placeholder="ex: 320" step="0.1" />
+      </label>
+
+      <label>
+        Espaçamento entre produtos (mm)
+        <input type="number" id="prodEspacamento" placeholder="ex: 80" step="0.1" />
+      </label>
+
+      <label>
+        Modo de cálculo
+        <select id="modoVelocidade">
+          <option value="capacidade">Calcular capacidade (prod/min)</option>
+          <option value="velocidade">Calcular velocidade necessária</option>
+        </select>
+      </label>
+
+      <label id="velocEsteiraWrapper">
+        Velocidade da esteira (m/min)
+        <input type="number" id="velocEsteira" placeholder="ex: 30" step="0.1" />
+      </label>
+
+      <label id="capacidadeDesejadaWrapper" style="display:none;">
+        Capacidade desejada (prod/min)
+        <input type="number" id="capacidadeDesejada" placeholder="ex: 40" step="0.1" />
+      </label>
+
+      <button type="button" id="calcularVelocidadeProdutos">Calcular</button>
+      <button type="button" id="limparVelocidadeProdutos">Limpar</button>
+    </div>
+
+    <div id="resultadoVelocidadeProdutos" class="result"></div>
+  </section>
+
 </main>
 
 <footer class="wrap" style="margin:30px 0; text-align:center; font-size:12px;">
