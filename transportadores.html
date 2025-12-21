@@ -2,17 +2,15 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
-  <title>Mecalc – Cálculos para Transportadores</title>
+  <title>Mecalc – Transportadores</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <link rel="stylesheet" href="styles.css" />
 </head>
 
 <body>
-
 <header class="top">
   <div class="wrap">
     <h1>Mecalc</h1>
-
     <nav class="main-nav">
       <a href="home.html">Home</a>
       <a href="index.html">Pneumática</a>
@@ -23,127 +21,113 @@
 
 <main class="wrap">
 
-  <!-- CARD 1: Velocidade da esteira a partir da produção -->
+  <!-- CARD 1 – TORQUE NO TAMBOR -->
   <section class="card">
-    <h2>Velocidade da esteira a partir da produção</h2>
-
-    <div class="torque-grid">
-      <label>
-        Comprimento do produto (mm)
-        <input type="number" id="prodLength" placeholder="ex: 320" step="0.1" />
-      </label>
-
-      <label>
-        Espaçamento livre entre produtos (mm)
-        <input type="number" id="gap" placeholder="ex: 600" step="0.1" />
-      </label>
-
-      <label>
-        Produção desejada (peças/min)
-        <input type="number" id="rate" placeholder="ex: 25" step="0.1" />
-      </label>
-
-      <label>
-        Diâmetro do tambor motriz (mm)
-        <input type="number" id="drumDiameter" placeholder="ex: 80" step="0.1" />
-      </label>
-
-      <label>
-        Comprimento da esteira (m)
-        <input type="number" id="beltLength" placeholder="ex: 3" step="0.1" />
-      </label>
-
-      <button type="button" id="calcTransport">Calcular velocidade</button>
-      <button type="button" id="clearTransport">Limpar</button>
-    </div>
-
-    <div id="transportResult" class="result"></div>
-  </section>
-
-  <!-- CARD 2: RPM -> Velocidade -->
-  <section class="card torque-card">
-    <h2>RPM do tambor → velocidade da esteira</h2>
-
-    <div class="torque-grid">
-      <label>
-        Diâmetro do tambor (mm)
-        <input type="number" id="convDrumDiameter" placeholder="ex: 80" step="0.1" />
-      </label>
-
-      <label>
-        RPM do tambor
-        <input type="number" id="convRpm" placeholder="ex: 30" step="0.1" />
-      </label>
-
-      <button type="button" id="calcConv">Calcular velocidade</button>
-      <button type="button" id="clearConv">Limpar</button>
-    </div>
-
-    <div id="convResult" class="result"></div>
-  </section>
-
-  <!-- CARD 3: Torque no tambor do transportador -->
-  <section class="card torque-card">
     <h2>Torque no tambor do transportador</h2>
 
     <div class="torque-grid">
-
       <label>
         Massa total transportada (kg)
-        <input type="number" id="massKg" placeholder="ex: 80" step="0.1" />
+        <input type="number" id="massaTransportada" placeholder="ex: 80" step="0.1" />
       </label>
 
       <label>
         Diâmetro do tambor (mm)
-        <input type="number" id="torqueDiameter" placeholder="ex: 100" step="0.1" />
+        <input type="number" id="diametroTambor" placeholder="ex: 100" step="0.1" />
       </label>
 
       <label>
         Tipo de contato / atrito
-        <select id="frictionPreset">
-          <option value="">Selecionar atrito…</option>
-
-          <optgroup label="Aço / Aço">
-            <option value="0.60">Aço-aço estático seco (μ = 0,60)</option>
-            <option value="0.50">Aço-aço deslizante seco (μ = 0,50)</option>
-            <option value="0.35">Aço-aço estático lubrificado (μ = 0,35)</option>
-            <option value="0.25">Aço-aço deslizante lubrificado (μ = 0,25)</option>
-          </optgroup>
-
-          <optgroup label="Madeira / Aço">
-            <option value="0.75">Madeira-aço estático (μ = 0,75)</option>
-            <option value="0.60">Madeira-aço deslizante (μ = 0,60)</option>
-          </optgroup>
-
-          <optgroup label="Madeira / Madeira">
-            <option value="0.75">Madeira-madeira estático (μ = 0,75)</option>
-            <option value="0.50">Madeira-madeira deslizante (μ = 0,50)</option>
-          </optgroup>
-
-          <optgroup label="Plástico / Aço">
-            <option value="0.45">Plástico-aço estático (μ = 0,45)</option>
-            <option value="0.25">Plástico-aço deslizante (μ = 0,25)</option>
-          </optgroup>
-
-          <optgroup label="Aço / Plástico">
-            <option value="0.45">Aço-plástico estático (μ = 0,45)</option>
-            <option value="0.35">Aço-plástico deslizante (μ = 0,35)</option>
-          </optgroup>
-
-          <option value="custom">Outro (informar manualmente)</option>
+        <select id="tipoContatoAtrito">
+          <option value="">Selecione...</option>
+          <option value="0.60">Atrito deslizante aço sobre aço seco (μ = 0,60)</option>
+          <option value="0.50">Atrito deslizante de madeira sobre madeira (μ = 0,50)</option>
+          <option value="0.75">Atrito estático aço-plástico (μ = 0,75)</option>
+          <option value="0.45">Atrito estático entre plástico e aço (μ = 0,45)</option>
+          <option value="0.25">Atrito deslizante plástico sobre aço (μ = 0,25)</option>
+          <option value="0.35">Atrito deslizante aço sobre plástico (μ = 0,35)</option>
         </select>
       </label>
 
       <label>
         Coeficiente de atrito (μ)
-        <input type="number" id="friction" placeholder="ex: 0,12" step="0.01" />
+        <input type="text" id="coefAtrito" placeholder="ex: 0,45" readonly />
       </label>
 
-      <button type="button" id="calcTorqueConv">Calcular torque</button>
-      <button type="button" id="clearTorqueConv">Limpar</button>
+      <button type="button" id="calcularTorqueTambor">Calcular torque</button>
+      <button type="button" id="limparTorqueTambor">Limpar</button>
     </div>
 
-    <div id="torqueConvResult" class="result"></div>
+    <div id="resultadoTorqueTambor" class="result"></div>
+  </section>
+
+  <!-- CARD 2 – POTÊNCIA DO TRANSPORTADOR -->
+  <section class="card">
+    <h2>Potência do transportador</h2>
+
+    <p class="para" style="margin-bottom:6px;">
+      Utilize o mesmo <b>coeficiente de atrito (μ)</b> definido acima. Este cálculo considera
+      o esforço médio em regime permanente (sem acelerações bruscas).
+    </p>
+
+    <div class="torque-grid">
+      <label>
+        Massa total transportada (kg)
+        <input type="number" id="massaPotencia" placeholder="ex: 80" step="0.1" />
+      </label>
+
+      <label>
+        Tipo de transportador
+        <select id="tipoTransportador">
+          <option value="horizontal">Horizontal</option>
+          <option value="inclinado">Inclinado</option>
+        </select>
+      </label>
+
+      <label>
+        Ângulo em relação à horizontal (°)
+        <input type="number" id="anguloTransportador" placeholder="ex: 12" step="0.1" />
+      </label>
+
+      <label>
+        Velocidade do transportador
+        <input type="number" id="velocidadeValor" placeholder="ex: 0,5" step="0.01" />
+      </label>
+
+      <label>
+        Unidade da velocidade
+        <select id="velocidadeUnidade">
+          <option value="ms">m/s</option>
+          <option value="mmin">m/min</option>
+        </select>
+      </label>
+
+      <label>
+        Rendimento global (η)
+        <select id="rendimentoSelect">
+          <option value="0.75">0,75 – pesado / esteira longa</option>
+          <option value="0.80" selected>0,80 – típico</option>
+          <option value="0.85">0,85 – leve / bem alinhado</option>
+          <option value="custom">Personalizado</option>
+        </select>
+      </label>
+
+      <label id="rendimentoCustomWrapper" style="display:none;">
+        Rendimento personalizado (0–1)
+        <input type="number" id="rendimentoCustom" placeholder="ex: 0,9" step="0.01" />
+      </label>
+
+      <button type="button" id="calcularPotenciaTransportador">Calcular potência</button>
+      <button type="button" id="limparPotenciaTransportador">Limpar</button>
+    </div>
+
+    <div id="resultadoPotenciaTransportador" class="result"></div>
+
+    <p class="para" style="font-size:12px; color:var(--muted); margin-top:10px;">
+      Dica: para partidas frequentes, impacto ou operação pesada,
+      considere utilizar fator de segurança no motor (próximo tamanho comercial acima
+      e/ou uso de inversor de frequência com rampas suaves).
+    </p>
   </section>
 
 </main>
