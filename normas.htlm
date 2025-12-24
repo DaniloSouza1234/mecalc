@@ -99,8 +99,8 @@
     </div>
 
     <div class="pdf-wrap">
-      <iframe id="pdf471" class="pdf-embed" src="assets/pdf/din-471.pdf" title="DIN 471"></iframe>
-      <iframe id="pdf472" class="pdf-embed" src="assets/pdf/din-472.pdf" title="DIN 472" style="display:none;"></iframe>
+      <iframe id="pdf471" class="pdf-embed" src="./assets/pdf/din-471.pdf" title="DIN 471"></iframe>
+      <iframe id="pdf472" class="pdf-embed" src="./assets/pdf/din-472.pdf" style="display:none;"></iframe>
     </div>
 
     <div class="chips">
@@ -144,4 +144,5 @@
 
 </body>
 </html>
+
 
