@@ -5,6 +5,58 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Mecalc — Home</title>
   <link rel="stylesheet" href="styles.css" />
+
+  <!-- CSS local do HOME (garante que não “buga” por causa do styles.css) -->
+  <style>
+    .home-hero{ padding: 20px; }
+
+    .home-hero-grid{
+      display:grid;
+      grid-template-columns: 1.2fr 0.8fr;
+      gap: 20px;
+      align-items:center;
+    }
+    @media (max-width: 900px){
+      .home-hero-grid{ grid-template-columns: 1fr; text-align:center; }
+    }
+
+    .home-list{
+      margin-top: 12px;
+      padding-left: 18px;
+      color: var(--muted);
+    }
+    .home-list li{ margin-bottom: 6px; }
+
+    /* Engrenagem: tamanho e animação garantidos */
+    .home-hero-visual{
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      min-height: 220px;
+    }
+
+    .gear-holder{
+      width: 220px;
+      height: 220px;
+      display:flex;
+      justify-content:center;
+      align-items:center;
+    }
+
+    .gear-svg{
+      width: 200px;
+      height: 200px;
+      display:block;
+      animation: mecalcSpin 12s linear infinite;
+      filter: drop-shadow(0 0 18px rgba(226,59,59,.35));
+      transform-origin: 50% 50%;
+    }
+
+    @keyframes mecalcSpin{
+      from{ transform: rotate(0deg); }
+      to{ transform: rotate(360deg); }
+    }
+  </style>
 </head>
 
 <body>
@@ -22,12 +74,9 @@
 
 <main class="wrap">
 
-  <!-- HERO / INTRO -->
   <section class="card home-hero">
-
     <div class="home-hero-grid">
 
-      <!-- TEXTO -->
       <div class="home-hero-text">
         <h2>Ferramentas de cálculo para Engenharia Mecânica</h2>
         <p class="para">
@@ -44,35 +93,36 @@
         </ul>
       </div>
 
-      <!-- ENGENHAGEM ANIMADA -->
       <div class="home-hero-visual" aria-hidden="true">
-        <svg class="gear-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
-          <defs>
-            <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
-              <stop offset="0%" stop-color="#ff5a5a"/>
-              <stop offset="100%" stop-color="#b82020"/>
-            </linearGradient>
-          </defs>
+        <div class="gear-holder">
+          <svg class="gear-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+            <defs>
+              <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stop-color="#ff5a5a"/>
+                <stop offset="100%" stop-color="#b82020"/>
+              </linearGradient>
+            </defs>
 
-          <!-- corpo -->
-          <circle cx="100" cy="100" r="42" fill="url(#g)" />
+            <!-- Corpo -->
+            <circle cx="100" cy="100" r="44" fill="url(#g)" />
 
-          <!-- dentes -->
-          <g fill="url(#g)">
-            <rect x="96" y="8" width="8" height="20"/>
-            <rect x="96" y="172" width="8" height="20"/>
-            <rect x="8" y="96" width="20" height="8"/>
-            <rect x="172" y="96" width="20" height="8"/>
+            <!-- Dentes (8) -->
+            <g fill="url(#g)">
+              <rect x="96" y="6" width="8" height="22"/>
+              <rect x="96" y="172" width="8" height="22"/>
+              <rect x="6" y="96" width="22" height="8"/>
+              <rect x="172" y="96" width="22" height="8"/>
 
-            <rect x="32" y="24" width="8" height="20" transform="rotate(-45 36 34)"/>
-            <rect x="160" y="24" width="8" height="20" transform="rotate(45 164 34)"/>
-            <rect x="32" y="156" width="8" height="20" transform="rotate(45 36 166)"/>
-            <rect x="160" y="156" width="8" height="20" transform="rotate(-45 164 166)"/>
-          </g>
+              <rect x="30" y="22" width="8" height="22" transform="rotate(-45 34 33)"/>
+              <rect x="162" y="22" width="8" height="22" transform="rotate(45 166 33)"/>
+              <rect x="30" y="156" width="8" height="22" transform="rotate(45 34 167)"/>
+              <rect x="162" y="156" width="8" height="22" transform="rotate(-45 166 167)"/>
+            </g>
 
-          <!-- furo -->
-          <circle cx="100" cy="100" r="18" fill="#0b0d12"/>
-        </svg>
+            <!-- Furo -->
+            <circle cx="100" cy="100" r="18" fill="#0b0d12"/>
+          </svg>
+        </div>
       </div>
 
     </div>
