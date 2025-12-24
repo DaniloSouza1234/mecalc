@@ -1,18 +1,16 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <title>Mecalc – Cálculo de Força de Cilindros Pneumáticos</title>
+  <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Mecalc — Pneumática</title>
   <link rel="stylesheet" href="styles.css" />
 </head>
-
 <body>
 
 <header class="top">
   <div class="wrap">
     <h1>Mecalc</h1>
-
     <nav class="main-nav">
       <a href="home.html">Home</a>
       <a href="index.html" class="active">Pneumática</a>
@@ -23,11 +21,11 @@
 
 <main class="wrap">
 
-  <!-- CARD: Tabela de força dos cilindros -->
+  <!-- TABELA -->
   <section class="card">
     <h2>Tabela de força do cilindro pneumático</h2>
     <p class="para" style="margin-top:4px;">
-      Valores em <b>kgf</b> para avanço e retorno, de <b>2 até 10 bar</b>.
+      Valores em <b>kgf</b> (avanço e retorno), de <b>2 até 10 bar</b>.
     </p>
 
     <div class="torque-grid" style="margin-top:10px; align-items:flex-end;">
@@ -62,9 +60,9 @@
 
     <div class="para" style="font-size:12px; color:var(--muted); margin-top:8px;">
       Interpolação linear aproximada:<br>
-      3 bar → entre 2 e 4 &nbsp;&nbsp;|&nbsp;&nbsp;
-      5 bar → entre 4 e 6 &nbsp;&nbsp;|&nbsp;&nbsp;
-      7 bar → entre 6 e 8 &nbsp;&nbsp;|&nbsp;&nbsp;
+      3 bar → entre 2 e 4 &nbsp;|&nbsp;
+      5 bar → entre 4 e 6 &nbsp;|&nbsp;
+      7 bar → entre 6 e 8 &nbsp;|&nbsp;
       9 bar → entre 8 e 10.
     </div>
 
@@ -73,71 +71,73 @@
     </div>
   </section>
 
-  <!-- CARD: Cálculo de torque na alavanca -->
+  <!-- TORQUE -->
   <section class="card torque-card">
     <h2>Cálculo de torque na alavanca</h2>
 
-    <!-- DIAGRAMA (crie a pasta img e o arquivo SVG abaixo) -->
-<div class="diagram-block">
-  <div class="diagram-svg" aria-label="Diagrama do ângulo entre cilindro e alavanca (θ inicial e θ final)">
-    <svg xmlns="http://www.w3.org/2000/svg" width="900" height="380" viewBox="0 0 900 380" style="width:100%;height:auto;display:block;">
-      <defs>
-        <style>
-          .s{fill:none;stroke:#d9d9d9;stroke-width:4;stroke-linecap:round;stroke-linejoin:round}
-          .d{fill:none;stroke:#d9d9d9;stroke-width:3;stroke-dasharray:10 10;stroke-linecap:round}
-          .t{fill:#d9d9d9;font: 18px system-ui, -apple-system, Segoe UI, Arial}
-          .m{fill:#d9d9d9;font: 15px system-ui, -apple-system, Segoe UI, Arial}
-          .red{stroke:#ff4b4b}
-          .blue{stroke:#4aa3ff}
-          .yellow{stroke:#ffd54a}
-        </style>
-      </defs>
+    <!-- BLOCO DO DIAGRAMA (SVG inline - NÃO depende de pasta img) -->
+    <div class="theta-help">
+      <div class="theta-help-head">
+        <div class="theta-title">Como medir θ</div>
+        <div class="theta-sub">
+          θ é o ângulo <b>entre a alavanca (pivô → pino)</b> e o <b>eixo do cilindro</b>, medido no <b>pino</b>.
+          Use <b>θ₀</b> (inicial) e <b>θ₁</b> (final) para o gráfico.
+        </div>
+      </div>
 
-      <text x="20" y="42" class="t">Como medir θ (ângulo entre cilindro e alavanca)</text>
-      <text x="20" y="68" class="m">θ é medido no pino de ligação: entre a alavanca (pivô → pino) e o eixo do cilindro (linha de ação).</text>
+      <div class="theta-diagram-wrap" aria-label="Diagrama θ0 e θ1">
+        <svg class="theta-diagram" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 360" role="img">
+          <defs>
+            <style>
+              .s{fill:none;stroke:#d9d9d9;stroke-width:4;stroke-linecap:round;stroke-linejoin:round}
+              .d{fill:none;stroke:#d9d9d9;stroke-width:3;stroke-dasharray:10 10;stroke-linecap:round}
+              .txt{fill:#d9d9d9;font: 16px system-ui, -apple-system, Segoe UI, Arial}
+              .red{stroke:#ff4b4b}
+              .blue{stroke:#4aa3ff}
+              .y{stroke:#ffd54a}
+            </style>
+          </defs>
 
-      <circle cx="190" cy="85" r="22" fill="none" stroke="#d9d9d9" stroke-width="4"/>
-      <circle cx="190" cy="85" r="6" fill="#d9d9d9"/>
-      <text x="225" y="92" class="m">Pivô</text>
+          <!-- Pivô -->
+          <circle cx="160" cy="70" r="22" fill="none" stroke="#d9d9d9" stroke-width="4"/>
+          <circle cx="160" cy="70" r="6" fill="#d9d9d9"/>
+          <text x="195" y="76" class="txt">Pivô</text>
 
-      <line x1="190" y1="85" x2="265" y2="310" class="s red"/>
-      <text x="85" y="205" class="m">Alavanca</text>
+          <!-- Alavanca -->
+          <line x1="160" y1="70" x2="255" y2="285" class="s red"/>
+          <text x="80" y="185" class="txt">Alavanca</text>
 
-      <circle cx="265" cy="310" r="7" fill="#d9d9d9"/>
-      <text x="280" y="332" class="m">Pino</text>
+          <!-- Pino -->
+          <circle cx="255" cy="285" r="7" fill="#d9d9d9"/>
+          <text x="270" y="305" class="txt">Pino</text>
 
-      <!-- Cilindro em duas posições (θ0 e θ1) -->
-      <line x1="265" y1="310" x2="760" y2="255" class="d blue"/>
-      <text x="770" y="260" class="m">Cilindro (θ₀)</text>
+          <!-- Cilindro θ0 (tracejado) -->
+          <line x1="255" y1="285" x2="800" y2="235" class="d blue"/>
+          <text x="810" y="240" class="txt">Cilindro (θ₀)</text>
 
-      <line x1="265" y1="310" x2="745" y2="150" class="s blue"/>
-      <text x="770" y="155" class="m">Cilindro (θ₁)</text>
+          <!-- Cilindro θ1 (cheio) -->
+          <line x1="255" y1="285" x2="780" y2="120" class="s blue"/>
+          <text x="810" y="125" class="txt">Cilindro (θ₁)</text>
 
-      <!-- Guias -->
-      <line x1="265" y1="310" x2="190" y2="85" class="d"/>
-      <line x1="265" y1="310" x2="760" y2="255" class="d"/>
-      <line x1="265" y1="310" x2="745" y2="150" class="d"/>
+          <!-- Guias -->
+          <line x1="255" y1="285" x2="160" y2="70" class="d"/>
+          <line x1="255" y1="285" x2="800" y2="235" class="d"/>
+          <line x1="255" y1="285" x2="780" y2="120" class="d"/>
 
-      <!-- Arcos θ0 e θ1 -->
-      <path d="M 228 272 A 70 70 0 0 1 324 300" class="s yellow"/>
-      <text x="330" y="286" class="t">θ₀</text>
+          <!-- Arcos -->
+          <path d="M 235 248 A 70 70 0 0 1 318 276" class="s y"/>
+          <text x="325" y="265" class="txt">θ₀</text>
 
-      <path d="M 232 268 A 95 95 0 0 0 314 228" class="s yellow"/>
-      <text x="320" y="226" class="t">θ₁</text>
+          <path d="M 240 244 A 95 95 0 0 0 318 205" class="s y"/>
+          <text x="325" y="205" class="txt">θ₁</text>
 
-      <text x="20" y="355" class="m">Dica: evite θ próximo de 0° ou 180° (sin(θ) ≈ 0 → torque muito baixo).</text>
-    </svg>
-  </div>
+          <!-- Nota -->
+          <text x="20" y="340" class="txt">Dica: evite θ perto de 0° ou 180° (sin(θ) ≈ 0 → torque muito baixo).</text>
+        </svg>
+      </div>
+    </div>
 
-  <p class="diagram-hint">
-    Meça <b>θ</b> como o ângulo <b>entre a alavanca (pivô → pino)</b> e o <b>eixo do cilindro</b> (linha de ação),
-    medido no <b>pino</b>. Informe <b>θ inicial</b> e <b>θ final</b> para gerar o gráfico.
-  </p>
-</div>
-
-
-    <div class="torque-grid">
-
+    <div class="torque-grid" style="margin-top:12px;">
       <label>
         Tipo de força (tabela)
         <select id="forceKind">
@@ -146,9 +146,7 @@
         </select>
       </label>
 
-      <button type="button" id="useTableForce">
-        Usar força da tabela
-      </button>
+      <button type="button" id="useTableForce">Usar força da tabela</button>
 
       <label>
         Força no cilindro (kgf)
@@ -170,9 +168,7 @@
         <input type="number" id="angleEnd" placeholder="ex: 90" step="0.1" />
       </label>
 
-      <button type="button" id="calculateTorque">
-        Calcular torque e gráfico
-      </button>
+      <button type="button" id="calculateTorque">Calcular torque e gráfico</button>
     </div>
 
     <div id="torqueResult" class="result"></div>
@@ -182,7 +178,7 @@
     </div>
   </section>
 
-  <!-- CARD: Dimensionar cilindro pelo torque desejado -->
+  <!-- DIMENSIONAMENTO -->
   <section class="card">
     <h2>Dimensionar cilindro pelo torque desejado</h2>
 
@@ -205,17 +201,14 @@
         </select>
       </label>
 
-      <button type="button" id="calcCylinder">
-        Dimensionar cilindro
-      </button>
+      <button type="button" id="calcCylinder">Dimensionar cilindro</button>
     </div>
 
     <div id="cylinderResult" class="result"></div>
 
     <div class="para" style="font-size:12px; color:var(--muted); margin-top:10px;">
-      Dica: para aplicações com impacto, alta ciclagem ou cargas variáveis, considere utilizar
-      fator de segurança maior, cilindro com diâmetro superior e/ou válvulas de retenção
-      pilotadas para evitar recuo da carga.
+      Dica: para aplicações com impacto, alta ciclagem ou cargas variáveis, considere fator de segurança maior,
+      cilindro com diâmetro superior e/ou válvulas de retenção pilotadas para evitar recuo da carga.
     </div>
   </section>
 
@@ -225,11 +218,7 @@
   © 2025 Mecalc — Ferramentas para Engenharia Mecânica
 </footer>
 
-<!-- Chart.js para o gráfico de torque x ângulo -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-<!-- Lógica da tabela, torque e dimensionamento -->
 <script src="app.js"></script>
 </body>
 </html>
-
