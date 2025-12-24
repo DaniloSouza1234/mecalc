@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <title>Mecalc – Normas & Catálogos</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="./styles.css" />
 
   <style>
     .tabs{
@@ -24,6 +24,7 @@
       color: var(--title);
       font-weight: 800;
       cursor: pointer;
+      white-space: nowrap;
     }
     .tab-btn.active{
       border-color: rgba(226,59,59,.55);
@@ -36,6 +37,7 @@
       overflow: hidden;
       background: rgba(0,0,0,.18);
     }
+
     .pdf-embed{
       width: 100%;
       height: 78vh;
@@ -69,6 +71,18 @@
       color: var(--muted);
       line-height: 1.5;
     }
+
+    .warn{
+      margin-top: 10px;
+      padding: 10px 12px;
+      border-radius: 12px;
+      border: 1px solid rgba(255,213,74,.35);
+      background: rgba(255,213,74,.06);
+      color: rgba(255,255,255,.88);
+      font-size: 12px;
+      line-height: 1.5;
+      display:none;
+    }
   </style>
 </head>
 
@@ -78,15 +92,16 @@
   <div class="wrap">
     <h1>Mecalc</h1>
     <nav class="main-nav">
-      <a href="home.html">Home</a>
-      <a href="index.html">Pneumática</a>
-      <a href="transportadores.html">Transportadores</a>
-      <a href="normas.html" class="active">Normas</a>
+      <a href="./home.html">Home</a>
+      <a href="./index.html">Pneumática</a>
+      <a href="./transportadores.html">Transportadores</a>
+      <a href="./normas.html" class="active">Normas</a>
     </nav>
   </div>
 </header>
 
 <main class="wrap">
+
   <section class="card">
     <h2>Normas & Catálogos</h2>
     <p class="para">
@@ -99,19 +114,42 @@
     </div>
 
     <div class="pdf-wrap">
-      <iframe id="pdf471" class="pdf-embed" src="assets/pdf/din-471.pdf" title="DIN 471"></iframe>
-      <iframe id="pdf472" class="pdf-embed" src="assets/pdf/din-472.pdf" title="DIN 472" style="display:none;"></iframe>
+      <!-- IMPORTANTE: caminhos com ./ para evitar 404 por resolução de path -->
+      <iframe
+        id="pdf471"
+        class="pdf-embed"
+        src="./assets/pdf/din-471.pdf"
+        title="DIN 471 — Anel para eixo"
+      ></iframe>
+
+      <iframe
+        id="pdf472"
+        class="pdf-embed"
+        src="./assets/pdf/din-472.pdf"
+        title="DIN 472 — Anel para furo"
+        style="display:none;"
+      ></iframe>
     </div>
 
+    <!-- Fallback: abrir em nova aba -->
     <div class="chips">
-      <a class="chip" href="assets/pdf/din-471.pdf" target="_blank" rel="noreferrer">Abrir DIN 471</a>
-      <a class="chip" href="assets/pdf/din-472.pdf" target="_blank" rel="noreferrer">Abrir DIN 472</a>
+      <a class="chip" href="./assets/pdf/din-471.pdf" target="_blank" rel="noreferrer">Abrir DIN 471</a>
+      <a class="chip" href="./assets/pdf/din-472.pdf" target="_blank" rel="noreferrer">Abrir DIN 472</a>
     </div>
 
     <div class="note">
       Dica: no visualizador do navegador, use <b>Ctrl + F</b> para localizar pelo diâmetro nominal (ex.: 25, 40, 80).
     </div>
+
+    <div id="pdfWarn" class="warn">
+      Se o PDF não estiver aparecendo dentro da página, use os botões <b>“Abrir DIN 471/472”</b> acima.
+      <br/>
+      Se ainda der 404, o caminho/pasta do PDF no repositório está diferente do esperado:
+      <code>assets/pdf/din-471.pdf</code> e <code>assets/pdf/din-472.pdf</code>.
+    </div>
+
   </section>
+
 </main>
 
 <footer class="wrap" style="margin:30px 0; text-align:center; font-size:12px;">
@@ -123,6 +161,7 @@
   const btn472 = document.getElementById("btn472");
   const pdf471 = document.getElementById("pdf471");
   const pdf472 = document.getElementById("pdf472");
+  const warn = document.getElementById("pdfWarn");
 
   function show471(){
     btn471.classList.add("active");
@@ -140,8 +179,25 @@
 
   btn471.addEventListener("click", show471);
   btn472.addEventListener("click", show472);
+
+  // teste simples: se o PDF não carregar (404), mostra aviso
+  async function checkPdf(url){
+    try{
+      const r = await fetch(url, { method: "HEAD" });
+      return r.ok;
+    }catch(e){
+      return false;
+    }
+  }
+
+  (async ()=>{
+    const ok471 = await checkPdf("./assets/pdf/din-471.pdf");
+    const ok472 = await checkPdf("./assets/pdf/din-472.pdf");
+    if(!ok471 || !ok472){
+      warn.style.display = "block";
+    }
+  })();
 </script>
 
 </body>
 </html>
-
