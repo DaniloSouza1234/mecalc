@@ -1,54 +1,88 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="980" height="420" viewBox="0 0 980 420">
-  <defs>
-    <style>
-      .s{fill:none;stroke:#d9d9d9;stroke-width:4;stroke-linecap:round;stroke-linejoin:round}
-      .d{fill:none;stroke:#d9d9d9;stroke-width:3;stroke-dasharray:10 10;stroke-linecap:round}
-      .t{fill:#d9d9d9;font: 18px system-ui, -apple-system, Segoe UI, Arial}
-      .m{fill:#d9d9d9;font: 15px system-ui, -apple-system, Segoe UI, Arial}
-      .red{stroke:#ff4b4b}
-      .blue{stroke:#4aa3ff}
-      .thin{stroke-width:2}
-    </style>
-  </defs>
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Mecalc — Home</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
 
-  <!-- Título -->
-  <text x="24" y="42" class="t">Ângulo entre cilindro e alavanca (θ) — usar no cálculo do torque</text>
-  <text x="24" y="70" class="m">Meça no pino de ligação: θ = ângulo entre a alavanca (pivô → pino) e o eixo do cilindro (linha de ação).</text>
+<body>
 
-  <!-- Pivô -->
-  <circle cx="200" cy="90" r="22" fill="none" stroke="#d9d9d9" stroke-width="4"/>
-  <circle cx="200" cy="90" r="6" fill="#d9d9d9"/>
-  <text x="235" y="98" class="m">Ponto de giro</text>
+<header class="top">
+  <div class="wrap">
+    <h1>Mecalc</h1>
+    <nav class="main-nav">
+      <a href="home.html" class="active">Home</a>
+      <a href="index.html">Pneumática</a>
+      <a href="transportadores.html">Transportadores</a>
+    </nav>
+  </div>
+</header>
 
-  <!-- Alavanca (vermelho) -->
-  <line x1="200" y1="90" x2="280" y2="330" class="s red"/>
-  <text x="95" y="215" class="m">Alavanca</text>
+<main class="wrap">
 
-  <!-- Pino de ligação -->
-  <circle cx="280" cy="330" r="7" fill="#d9d9d9"/>
-  <text x="295" y="336" class="m">Pino</text>
+  <!-- HERO / INTRO -->
+  <section class="card home-hero">
 
-  <!-- Cilindro - posição inicial (azul tracejado) -->
-  <line x1="280" y1="330" x2="820" y2="300" class="d"/>
-  <text x="835" y="306" class="m">Eixo do cilindro (inicial)</text>
+    <div class="home-hero-grid">
 
-  <!-- Cilindro - posição final (azul contínuo) -->
-  <line x1="280" y1="330" x2="820" y2="210" class="s blue"/>
-  <text x="835" y="216" class="m">Eixo do cilindro (final)</text>
+      <!-- TEXTO -->
+      <div class="home-hero-text">
+        <h2>Ferramentas de cálculo para Engenharia Mecânica</h2>
+        <p class="para">
+          O <b>Mecalc</b> é um conjunto de ferramentas práticas para auxiliar
+          engenheiros e projetistas no dimensionamento de sistemas mecânicos,
+          pneumáticos e de transporte industrial.
+        </p>
 
-  <!-- Guias do ângulo (linhas) -->
-  <line x1="280" y1="330" x2="200" y2="90" class="d"/>
+        <ul class="home-list">
+          <li>✔ Cálculo de força de cilindros pneumáticos</li>
+          <li>✔ Torque em alavancas com variação angular</li>
+          <li>✔ Dimensionamento de cilindros</li>
+          <li>✔ Transportadores: torque, potência e atrito</li>
+        </ul>
+      </div>
 
-  <!-- Arco θ inicial -->
-  <path d="M 238 252 A 110 110 0 0 1 382 318" class="s thin"/>
-  <text x="395" y="306" class="t">θ₀</text>
-  <text x="418" y="306" class="m">(inicial)</text>
+      <!-- ENGENHAGEM ANIMADA -->
+      <div class="home-hero-visual" aria-hidden="true">
+        <svg class="gear-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+          <defs>
+            <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stop-color="#ff5a5a"/>
+              <stop offset="100%" stop-color="#b82020"/>
+            </linearGradient>
+          </defs>
 
-  <!-- Arco θ final -->
-  <path d="M 246 245 A 125 125 0 0 1 355 264" class="s thin"/>
-  <text x="365" y="252" class="t">θ₁</text>
-  <text x="388" y="252" class="m">(final)</text>
+          <!-- corpo -->
+          <circle cx="100" cy="100" r="42" fill="url(#g)" />
 
-  <!-- Observação -->
-  <text x="24" y="388" class="m">Dica: se θ ficar perto de 0° ou 180°, sin(θ) ≈ 0 e o torque cai muito (ponto crítico do dimensionamento).</text>
-</svg>
+          <!-- dentes -->
+          <g fill="url(#g)">
+            <rect x="96" y="8" width="8" height="20"/>
+            <rect x="96" y="172" width="8" height="20"/>
+            <rect x="8" y="96" width="20" height="8"/>
+            <rect x="172" y="96" width="20" height="8"/>
+
+            <rect x="32" y="24" width="8" height="20" transform="rotate(-45 36 34)"/>
+            <rect x="160" y="24" width="8" height="20" transform="rotate(45 164 34)"/>
+            <rect x="32" y="156" width="8" height="20" transform="rotate(45 36 166)"/>
+            <rect x="160" y="156" width="8" height="20" transform="rotate(-45 164 166)"/>
+          </g>
+
+          <!-- furo -->
+          <circle cx="100" cy="100" r="18" fill="#0b0d12"/>
+        </svg>
+      </div>
+
+    </div>
+  </section>
+
+</main>
+
+<footer class="wrap" style="margin:30px 0; text-align:center; font-size:12px;">
+  © 2025 Mecalc — Ferramentas para Engenharia Mecânica
+</footer>
+
+</body>
+</html>
