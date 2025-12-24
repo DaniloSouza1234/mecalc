@@ -1,41 +1,73 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>Mecalc – Normas & Catálogos</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="stylesheet" href="styles.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="styles.css" />
 
   <style>
-    .tabs {
-      display: flex;
-      gap: 10px;
+    .tabs{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-top: 10px;
       margin-bottom: 14px;
     }
-    .tab-btn {
-      padding: 10px 16px;
+    .tab-btn{
+      width:auto;
+      padding: 0 14px;
+      height: 38px;
       border-radius: 10px;
-      border: 1px solid rgba(255,255,255,.15);
-      background: rgba(255,255,255,.05);
-      color: #fff;
-      font-weight: 700;
+      border: 1px solid var(--border);
+      background: rgba(0,0,0,.22);
+      color: var(--title);
+      font-weight: 800;
       cursor: pointer;
     }
-    .tab-btn.active {
-      background: #b91c1c;
-      border-color: #ef4444;
+    .tab-btn.active{
+      border-color: rgba(226,59,59,.55);
+      background: linear-gradient(180deg, rgba(226,59,59,.95), rgba(190,34,34,.95));
     }
-    iframe {
+
+    .pdf-wrap{
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,.08);
+      overflow: hidden;
+      background: rgba(0,0,0,.18);
+    }
+    .pdf-embed{
       width: 100%;
       height: 78vh;
-      border: none;
-      border-radius: 12px;
-      background: #111;
+      border: 0;
+      display: block;
+      background: rgba(0,0,0,.18);
     }
-    .note {
+
+    .chips{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-top: 12px;
+    }
+    .chip{
+      display:inline-block;
+      padding: 8px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.04);
+      color: rgba(255,255,255,.90);
+      text-decoration:none;
+      font-size: 12px;
+      font-weight: 800;
+    }
+    .chip:hover{ filter: brightness(1.05); }
+
+    .note{
       margin-top: 10px;
-      font-size: 13px;
-      color: #ccc;
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.5;
     }
   </style>
 </head>
@@ -55,42 +87,59 @@
 </header>
 
 <main class="wrap">
-
   <section class="card">
-    <h2>Anéis Elásticos – Normas DIN</h2>
+    <h2>Normas & Catálogos</h2>
     <p class="para">
-      Consulta técnica direta das normas DIN para anéis elásticos.
+      Anéis elásticos: <b>DIN 471 (para eixo)</b> e <b>DIN 472 (para furo)</b>.
     </p>
 
     <div class="tabs">
-      <button class="tab-btn active" onclick="show471()">DIN 471 – Anel para eixo</button>
-      <button class="tab-btn" onclick="show472()">DIN 472 – Anel para furo</button>
+      <button class="tab-btn active" id="btn471" type="button">DIN 471 — Anel para eixo</button>
+      <button class="tab-btn" id="btn472" type="button">DIN 472 — Anel para furo</button>
     </div>
 
-    <iframe id="pdf471" src="assets/pdf/din-471.pdf"></iframe>
-    <iframe id="pdf472" src="assets/pdf/din-472.pdf" style="display:none;"></iframe>
+    <div class="pdf-wrap">
+      <iframe id="pdf471" class="pdf-embed" src="assets/pdf/din-471.pdf" title="DIN 471"></iframe>
+      <iframe id="pdf472" class="pdf-embed" src="assets/pdf/din-472.pdf" title="DIN 472" style="display:none;"></iframe>
+    </div>
+
+    <div class="chips">
+      <a class="chip" href="assets/pdf/din-471.pdf" target="_blank" rel="noreferrer">Abrir DIN 471</a>
+      <a class="chip" href="assets/pdf/din-472.pdf" target="_blank" rel="noreferrer">Abrir DIN 472</a>
+    </div>
 
     <div class="note">
-      💡 Dica: use <b>Ctrl + F</b> no PDF para buscar pelo diâmetro nominal (ex.: 25, 40, 80).
+      Dica: no visualizador do navegador, use <b>Ctrl + F</b> para localizar pelo diâmetro nominal (ex.: 25, 40, 80).
     </div>
   </section>
-
 </main>
 
+<footer class="wrap" style="margin:30px 0; text-align:center; font-size:12px;">
+  © 2025 Mecalc — Normas & Catálogos
+</footer>
+
 <script>
+  const btn471 = document.getElementById("btn471");
+  const btn472 = document.getElementById("btn472");
+  const pdf471 = document.getElementById("pdf471");
+  const pdf472 = document.getElementById("pdf472");
+
   function show471(){
-    document.getElementById('pdf471').style.display = 'block';
-    document.getElementById('pdf472').style.display = 'none';
-    document.querySelectorAll('.tab-btn')[0].classList.add('active');
-    document.querySelectorAll('.tab-btn')[1].classList.remove('active');
+    btn471.classList.add("active");
+    btn472.classList.remove("active");
+    pdf471.style.display = "block";
+    pdf472.style.display = "none";
   }
 
   function show472(){
-    document.getElementById('pdf471').style.display = 'none';
-    document.getElementById('pdf472').style.display = 'block';
-    document.querySelectorAll('.tab-btn')[1].classList.add('active');
-    document.querySelectorAll('.tab-btn')[0].classList.remove('active');
+    btn472.classList.add("active");
+    btn471.classList.remove("active");
+    pdf472.style.display = "block";
+    pdf471.style.display = "none";
   }
+
+  btn471.addEventListener("click", show471);
+  btn472.addEventListener("click", show472);
 </script>
 
 </body>
