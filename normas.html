@@ -7,28 +7,33 @@
   <link rel="stylesheet" href="./styles.css" />
 
   <style>
-    .tabs{
-      display:flex;
-      gap:10px;
-      flex-wrap:wrap;
+    .row{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
       margin-top: 10px;
       margin-bottom: 14px;
     }
-    .tab-btn{
-      width:auto;
-      padding: 0 14px;
-      height: 38px;
+    @media (max-width: 900px){
+      .row{ grid-template-columns: 1fr; }
+    }
+    .field label{
+      display:block;
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 6px;
+      font-weight: 800;
+    }
+    .field select{
+      width:100%;
+      height: 40px;
       border-radius: 10px;
       border: 1px solid var(--border);
       background: rgba(0,0,0,.22);
       color: var(--title);
+      padding: 0 12px;
       font-weight: 800;
-      cursor: pointer;
-      white-space: nowrap;
-    }
-    .tab-btn.active{
-      border-color: rgba(226,59,59,.55);
-      background: linear-gradient(180deg, rgba(226,59,59,.95), rgba(190,34,34,.95));
+      outline: none;
     }
 
     .pdf-wrap{
@@ -37,7 +42,6 @@
       overflow: hidden;
       background: rgba(0,0,0,.18);
     }
-
     .pdf-embed{
       width: 100%;
       height: 78vh;
@@ -71,7 +75,6 @@
       color: var(--muted);
       line-height: 1.5;
     }
-
     .warn{
       margin-top: 10px;
       padding: 10px 12px;
@@ -105,83 +108,97 @@
   <section class="card">
     <h2>Normas & Catálogos</h2>
     <p class="para">
-      Anéis elásticos: <b>DIN 471 (para eixo)</b> e <b>DIN 472 (para furo)</b>.
+      Biblioteca rápida de normas (PDF) para consulta. Use os filtros abaixo.
     </p>
 
-    <div class="tabs">
-      <button class="tab-btn active" id="btn471" type="button">DIN 471 — Anel para eixo</button>
-      <button class="tab-btn" id="btn472" type="button">DIN 472 — Anel para furo</button>
+    <div class="row">
+      <div class="field">
+        <label for="categoria">Categoria</label>
+        <select id="categoria"></select>
+      </div>
+      <div class="field">
+        <label for="norma">Norma</label>
+        <select id="norma"></select>
+      </div>
     </div>
 
     <div class="pdf-wrap">
-      <!-- IMPORTANTE: caminhos com ./ para evitar 404 por resolução de path -->
-      <iframe
-        id="pdf471"
-        class="pdf-embed"
-        src="./assets/pdf/din-471.pdf"
-        title="DIN 471 — Anel para eixo"
-      ></iframe>
-
-      <iframe
-        id="pdf472"
-        class="pdf-embed"
-        src="./assets/pdf/din-472.pdf"
-        title="DIN 472 — Anel para furo"
-        style="display:none;"
-      ></iframe>
+      <iframe id="pdfViewer" class="pdf-embed" src="" title="Norma PDF"></iframe>
     </div>
 
-    <!-- Fallback: abrir em nova aba -->
     <div class="chips">
-      <a class="chip" href="./assets/pdf/din-471.pdf" target="_blank" rel="noreferrer">Abrir DIN 471</a>
-      <a class="chip" href="./assets/pdf/din-472.pdf" target="_blank" rel="noreferrer">Abrir DIN 472</a>
+      <a class="chip" id="openPdf" href="#" target="_blank" rel="noreferrer">Abrir PDF</a>
     </div>
 
     <div class="note">
-      Dica: no visualizador do navegador, use <b>Ctrl + F</b> para localizar pelo diâmetro nominal (ex.: 25, 40, 80).
+      Dica: use <b>Ctrl + F</b> no PDF para buscar por diâmetro/medida.
     </div>
 
     <div id="pdfWarn" class="warn">
-      Se o PDF não estiver aparecendo dentro da página, use os botões <b>“Abrir DIN 471/472”</b> acima.
-      <br/>
-      Se ainda der 404, o caminho/pasta do PDF no repositório está diferente do esperado:
-      <code>assets/pdf/din-471.pdf</code> e <code>assets/pdf/din-472.pdf</code>.
+      Não foi possível carregar o PDF no viewer. Use o botão <b>“Abrir PDF”</b>.
+      Se der 404, confirme o caminho do arquivo dentro de <code>assets/pdf/</code>.
     </div>
 
   </section>
 
 </main>
 
-<footer class="wrap" style="margin:30px 0; text-align:center; font-size:12px;">
-  © 2025 Mecalc — Normas & Catálogos
-</footer>
-
 <script>
-  const btn471 = document.getElementById("btn471");
-  const btn472 = document.getElementById("btn472");
-  const pdf471 = document.getElementById("pdf471");
-  const pdf472 = document.getElementById("pdf472");
+  // ✅ Cadastro central das normas
+  // Basta adicionar novos itens aqui no futuro.
+  const NORMAS = [
+    {
+      categoria: "Anéis elásticos",
+      itens: [
+        { nome: "DIN 471 — Anel para eixo (externo)", path: "./assets/pdf/aneis/din-471.pdf" },
+        { nome: "DIN 472 — Anel para furo (interno)", path: "./assets/pdf/aneis/din-472.pdf" },
+      ]
+    },
+    {
+      categoria: "Chavetas",
+      itens: [
+        // EXEMPLO: troque o nome/arquivo quando você me enviar a norma certa
+        { nome: "DIN 6885 — Chaveta paralela", path: "./assets/pdf/chavetas/din-6885.pdf" },
+      ]
+    }
+  ];
+
+  const categoriaSel = document.getElementById("categoria");
+  const normaSel = document.getElementById("norma");
+  const viewer = document.getElementById("pdfViewer");
+  const openBtn = document.getElementById("openPdf");
   const warn = document.getElementById("pdfWarn");
 
-  function show471(){
-    btn471.classList.add("active");
-    btn472.classList.remove("active");
-    pdf471.style.display = "block";
-    pdf472.style.display = "none";
+  function uniqueCategorias(){
+    return NORMAS.map(x => x.categoria);
   }
 
-  function show472(){
-    btn472.classList.add("active");
-    btn471.classList.remove("active");
-    pdf472.style.display = "block";
-    pdf471.style.display = "none";
+  function getCategoriaObj(nome){
+    return NORMAS.find(x => x.categoria === nome);
   }
 
-  btn471.addEventListener("click", show471);
-  btn472.addEventListener("click", show472);
+  function fillCategorias(){
+    categoriaSel.innerHTML = "";
+    uniqueCategorias().forEach((c, i) => {
+      const opt = document.createElement("option");
+      opt.value = c;
+      opt.textContent = c;
+      categoriaSel.appendChild(opt);
+    });
+  }
 
-  // teste simples: se o PDF não carregar (404), mostra aviso
-  async function checkPdf(url){
+  function fillNormas(catNome){
+    normaSel.innerHTML = "";
+    const cat = getCategoriaObj(catNome);
+    cat.itens.forEach((it) => {
+      const opt = document.createElement("option");
+      opt.value = it.path;
+      opt.textContent = it.nome;
+      normaSel.appendChild(opt);
+    });
+  }
+
+  async function headOk(url){
     try{
       const r = await fetch(url, { method: "HEAD" });
       return r.ok;
@@ -190,12 +207,30 @@
     }
   }
 
-  (async ()=>{
-    const ok471 = await checkPdf("./assets/pdf/din-471.pdf");
-    const ok472 = await checkPdf("./assets/pdf/din-472.pdf");
-    if(!ok471 || !ok472){
-      warn.style.display = "block";
-    }
+  async function setViewer(path){
+    viewer.src = path;
+    openBtn.href = path;
+
+    // pequeno check (se falhar mostra aviso)
+    const ok = await headOk(path);
+    warn.style.display = ok ? "none" : "block";
+  }
+
+  // eventos
+  categoriaSel.addEventListener("change", async () => {
+    fillNormas(categoriaSel.value);
+    await setViewer(normaSel.value);
+  });
+
+  normaSel.addEventListener("change", async () => {
+    await setViewer(normaSel.value);
+  });
+
+  // init
+  (async function init(){
+    fillCategorias();
+    fillNormas(uniqueCategorias()[0]);
+    await setViewer(normaSel.value);
   })();
 </script>
 
