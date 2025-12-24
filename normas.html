@@ -144,8 +144,9 @@
 </main>
 
 <script>
-  // ✅ Cadastro central das normas
-  // Basta adicionar novos itens aqui no futuro.
+  // =========================
+  //  Cadastro central das normas
+  // =========================
   const NORMAS = [
     {
       categoria: "Anéis elásticos",
@@ -157,45 +158,85 @@
     {
       categoria: "Chavetas",
       itens: [
-        // EXEMPLO: troque o nome/arquivo quando você me enviar a norma certa
         { nome: "DIN 6885 — Chaveta paralela", path: "./assets/pdf/chavetas/din-6885.pdf" },
       ]
     }
   ];
 
+  // =========================
+  //  Helpers
+  // =========================
   const categoriaSel = document.getElementById("categoria");
   const normaSel = document.getElementById("norma");
   const viewer = document.getElementById("pdfViewer");
   const openBtn = document.getElementById("openPdf");
   const warn = document.getElementById("pdfWarn");
 
+  const LS_CAT = "mecalc_normas_categoria";
+  const LS_NORMA = "mecalc_normas_norma";
+
   function uniqueCategorias(){
-    return NORMAS.map(x => x.categoria);
+    // evita duplicatas se no futuro repetir categorias
+    return Array.from(new Set(NORMAS.map(x => x.categoria)));
   }
 
   function getCategoriaObj(nome){
     return NORMAS.find(x => x.categoria === nome);
   }
 
-  function fillCategorias(){
+  function findNormaByName(catObj, normaName){
+    if(!catObj) return null;
+    return catObj.itens.find(it => it.nome === normaName) || null;
+  }
+
+  function fillCategorias(selected){
     categoriaSel.innerHTML = "";
-    uniqueCategorias().forEach((c, i) => {
+    const cats = uniqueCategorias();
+    cats.forEach((c) => {
       const opt = document.createElement("option");
       opt.value = c;
       opt.textContent = c;
       categoriaSel.appendChild(opt);
     });
+
+    // seleciona se existir, senão primeira
+    categoriaSel.value = cats.includes(selected) ? selected : cats[0];
   }
 
-  function fillNormas(catNome){
+  function fillNormas(catNome, selectedNormaName){
     normaSel.innerHTML = "";
     const cat = getCategoriaObj(catNome);
+    if(!cat || !cat.itens || cat.itens.length === 0) return;
+
     cat.itens.forEach((it) => {
       const opt = document.createElement("option");
       opt.value = it.path;
       opt.textContent = it.nome;
       normaSel.appendChild(opt);
     });
+
+    // tenta selecionar por nome; senão primeira
+    const byName = findNormaByName(cat, selectedNormaName);
+    if(byName){
+      normaSel.value = byName.path;
+    }else{
+      normaSel.value = cat.itens[0].path;
+    }
+  }
+
+  function setUrlParams(cat, normaName){
+    const url = new URL(window.location.href);
+    url.searchParams.set("cat", cat);
+    url.searchParams.set("norma", normaName);
+    window.history.replaceState({}, "", url.toString());
+  }
+
+  function getUrlParams(){
+    const url = new URL(window.location.href);
+    return {
+      cat: url.searchParams.get("cat") || "",
+      norma: url.searchParams.get("norma") || ""
+    };
   }
 
   async function headOk(url){
@@ -211,26 +252,52 @@
     viewer.src = path;
     openBtn.href = path;
 
-    // pequeno check (se falhar mostra aviso)
+    // check simples (se falhar, mostra aviso)
     const ok = await headOk(path);
     warn.style.display = ok ? "none" : "block";
   }
 
-  // eventos
+  function currentNormaName(){
+    const opt = normaSel.options[normaSel.selectedIndex];
+    return opt ? opt.textContent : "";
+  }
+
+  function persistSelection(){
+    localStorage.setItem(LS_CAT, categoriaSel.value);
+    localStorage.setItem(LS_NORMA, currentNormaName());
+    setUrlParams(categoriaSel.value, currentNormaName());
+  }
+
+  // =========================
+  //  Eventos
+  // =========================
   categoriaSel.addEventListener("change", async () => {
-    fillNormas(categoriaSel.value);
+    fillNormas(categoriaSel.value, "");
     await setViewer(normaSel.value);
+    persistSelection();
   });
 
   normaSel.addEventListener("change", async () => {
     await setViewer(normaSel.value);
+    persistSelection();
   });
 
-  // init
+  // =========================
+  //  Init (prioridade: URL > localStorage > padrão)
+  // =========================
   (async function init(){
-    fillCategorias();
-    fillNormas(uniqueCategorias()[0]);
+    const qp = getUrlParams();
+    const savedCat = localStorage.getItem(LS_CAT) || "";
+    const savedNorma = localStorage.getItem(LS_NORMA) || "";
+
+    const initCat = qp.cat || savedCat || uniqueCategorias()[0];
+    const initNormaName = qp.norma || savedNorma || "";
+
+    fillCategorias(initCat);
+    fillNormas(categoriaSel.value, initNormaName);
+
     await setViewer(normaSel.value);
+    persistSelection();
   })();
 </script>
 
