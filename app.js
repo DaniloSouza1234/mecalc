@@ -14,7 +14,7 @@ document.addEventListener("DOMContentLoaded", function () {
   // ================= Dados da tabela de força =================
   const bores = [10, 12, 16, 20, 25, 32, 40, 50, 63, 80, 100, 125, 160, 200, 250, 320];
 
-  // Rosca típica da conexão pneumática (porta de ar). Pode variar por série do cilindro.
+  // Rosca típica da conexão pneumática (porta de ar). Pode variar conforme a série do cilindro.
   const portThread = {
     10: "M5",
     12: "M5",
@@ -33,7 +33,6 @@ document.addEventListener("DOMContentLoaded", function () {
     250: "G1",
     320: "G1 1/4"
   };
-
 
   // Pressões base para cálculo direto:
   const pressuresBase = [2, 4, 6, 8, 10];
@@ -174,7 +173,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // destacar célula (diâmetro + pressão)
     if (boreVal && pVal && pressuresDisplay.includes(pVal)) {
-      const colIndex = pressuresDisplay.indexOf(pVal) + 3; // Ø + Rosca + colunas de pressão // +1 (0-based) +1 (coluna Ø)
+      const colIndex = pressuresDisplay.indexOf(pVal) + 3; // +1 (0-based) +1 (Ø) +1 (Rosca)
       const selector = `tbody tr[data-bore="${boreVal}"] td:nth-child(${colIndex})`;
       const cell = forceTable.querySelector(selector);
       if (cell) cell.classList.add("highlight-cell");
@@ -325,9 +324,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
     const ctx = document.getElementById("forceChart");
     if (ctx && window.Chart) {
-      if (chartInstance) {
-        chartInstance.destroy();
-      }
+      if (chartInstance) chartInstance.destroy();
+
       chartInstance = new Chart(ctx, {
         type: "line",
         data: {
@@ -352,9 +350,7 @@ document.addEventListener("DOMContentLoaded", function () {
             }
           },
           plugins: {
-            legend: {
-              labels: { color: "#ccc" }
-            }
+            legend: { labels: { color: "#ccc" } }
           }
         }
       });
@@ -402,7 +398,6 @@ document.addEventListener("DOMContentLoaded", function () {
       const tmp = a0; a0 = a1; a1 = tmp;
     }
 
-    // Torque desejado em kgf·m
     let T_req_kgfm = T_val;
     if (unit === "Nm") {
       T_req_kgfm = T_val / 9.80665;
@@ -410,7 +405,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
     const L_m = L_mm / 1000.0;
 
-    // pior caso (menor |sin|)
     const sinVals = [];
     for (let ang = a0; ang <= a1; ang += 1) {
       const rad = ang * Math.PI / 180.0;
@@ -427,7 +421,6 @@ document.addEventListener("DOMContentLoaded", function () {
     const F_req_kgf = T_req_kgfm / (L_m * minSin);
     const F_req_N   = F_req_kgf * 9.80665;
 
-    // procurar menor diâmetro que atenda
     let selectedBore = null;
     let F_cyl_kgf_sel = null;
 
@@ -452,22 +445,20 @@ document.addEventListener("DOMContentLoaded", function () {
       return;
     }
 
-    // relação entre força disponível e força mínima necessária
-    const ratio    = F_cyl_kgf_sel / F_req_kgf;       // ex: 1,5 -> 150%
+    const ratio     = F_cyl_kgf_sel / F_req_kgf;
     const percTotal = ratio * 100.0;
-    const marginPct = (ratio - 1.0) * 100.0;          // ex: 50% acima
+    const marginPct = (ratio - 1.0) * 100.0;
 
     let html =
       `Torque desejado (mínimo): <b>${formatNumber(T_req_kgfm,3)} kgf·m</b> ` +
       `(&approx; <b>${formatNumber(T_req_kgfm * 9.80665,2)} N·m</b>)<br>` +
       `Força mínima necessária no pior ponto: <b>${formatNumber(F_req_kgf,2)} kgf</b> ` +
       `(&approx; <b>${formatNumber(F_req_N,2)} N</b>)<br><br>` +
-      `Sugestão de cilindro (avanço): Ø <b>${selectedBore} mm</b> em <b>${formatNumber(pBar,1)} bar</b>, ` +
-      `com força de avanço ≈ <b>${formatNumber(F_cyl_kgf_sel,2)} kgf</b>.<br>` +
+      `Sugestão de cilindro (avanço): Ø <b>${selectedBore} mm</b> ` +
+      `em <b>${formatNumber(pBar,1)} bar</b>, com força de avanço ≈ <b>${formatNumber(F_cyl_kgf_sel,2)} kgf</b>.<br>` +
       `O cilindro sugerido fornece cerca de <b>${formatNumber(percTotal,1)}%</b> ` +
       `da força mínima necessária (margem ≈ <b>${formatNumber(marginPct,1)}%</b> acima do mínimo).`;
 
-    // se a margem for baixa, destacar em amarelo
     if (marginPct < 20) {
       cylinderResultDiv.classList.add("result-warning");
       html +=
