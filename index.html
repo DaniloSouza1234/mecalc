@@ -78,17 +78,63 @@
     <h2>Cálculo de torque na alavanca</h2>
 
     <!-- DIAGRAMA (crie a pasta img e o arquivo SVG abaixo) -->
-    <div class="diagram-block">
-      <img
-        src="img/diagrama-angulo-theta0-theta1.svg"
-        alt="Diagrama do ângulo entre cilindro e alavanca (θ inicial e θ final)"
-        loading="lazy"
-      />
-      <p class="diagram-hint">
-        Meça <b>θ</b> como o ângulo <b>entre a alavanca (pivô → pino)</b> e o <b>eixo do cilindro</b> (linha de ação),
-        medido no <b>pino</b>. Informe <b>θ inicial</b> e <b>θ final</b> para gerar o gráfico.
-      </p>
-    </div>
+<div class="diagram-block">
+  <div class="diagram-svg" aria-label="Diagrama do ângulo entre cilindro e alavanca (θ inicial e θ final)">
+    <svg xmlns="http://www.w3.org/2000/svg" width="900" height="380" viewBox="0 0 900 380" style="width:100%;height:auto;display:block;">
+      <defs>
+        <style>
+          .s{fill:none;stroke:#d9d9d9;stroke-width:4;stroke-linecap:round;stroke-linejoin:round}
+          .d{fill:none;stroke:#d9d9d9;stroke-width:3;stroke-dasharray:10 10;stroke-linecap:round}
+          .t{fill:#d9d9d9;font: 18px system-ui, -apple-system, Segoe UI, Arial}
+          .m{fill:#d9d9d9;font: 15px system-ui, -apple-system, Segoe UI, Arial}
+          .red{stroke:#ff4b4b}
+          .blue{stroke:#4aa3ff}
+          .yellow{stroke:#ffd54a}
+        </style>
+      </defs>
+
+      <text x="20" y="42" class="t">Como medir θ (ângulo entre cilindro e alavanca)</text>
+      <text x="20" y="68" class="m">θ é medido no pino de ligação: entre a alavanca (pivô → pino) e o eixo do cilindro (linha de ação).</text>
+
+      <circle cx="190" cy="85" r="22" fill="none" stroke="#d9d9d9" stroke-width="4"/>
+      <circle cx="190" cy="85" r="6" fill="#d9d9d9"/>
+      <text x="225" y="92" class="m">Pivô</text>
+
+      <line x1="190" y1="85" x2="265" y2="310" class="s red"/>
+      <text x="85" y="205" class="m">Alavanca</text>
+
+      <circle cx="265" cy="310" r="7" fill="#d9d9d9"/>
+      <text x="280" y="332" class="m">Pino</text>
+
+      <!-- Cilindro em duas posições (θ0 e θ1) -->
+      <line x1="265" y1="310" x2="760" y2="255" class="d blue"/>
+      <text x="770" y="260" class="m">Cilindro (θ₀)</text>
+
+      <line x1="265" y1="310" x2="745" y2="150" class="s blue"/>
+      <text x="770" y="155" class="m">Cilindro (θ₁)</text>
+
+      <!-- Guias -->
+      <line x1="265" y1="310" x2="190" y2="85" class="d"/>
+      <line x1="265" y1="310" x2="760" y2="255" class="d"/>
+      <line x1="265" y1="310" x2="745" y2="150" class="d"/>
+
+      <!-- Arcos θ0 e θ1 -->
+      <path d="M 228 272 A 70 70 0 0 1 324 300" class="s yellow"/>
+      <text x="330" y="286" class="t">θ₀</text>
+
+      <path d="M 232 268 A 95 95 0 0 0 314 228" class="s yellow"/>
+      <text x="320" y="226" class="t">θ₁</text>
+
+      <text x="20" y="355" class="m">Dica: evite θ próximo de 0° ou 180° (sin(θ) ≈ 0 → torque muito baixo).</text>
+    </svg>
+  </div>
+
+  <p class="diagram-hint">
+    Meça <b>θ</b> como o ângulo <b>entre a alavanca (pivô → pino)</b> e o <b>eixo do cilindro</b> (linha de ação),
+    medido no <b>pino</b>. Informe <b>θ inicial</b> e <b>θ final</b> para gerar o gráfico.
+  </p>
+</div>
+
 
     <div class="torque-grid">
 
@@ -186,3 +232,4 @@
 <script src="app.js"></script>
 </body>
 </html>
+
