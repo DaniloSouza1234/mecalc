@@ -4,233 +4,216 @@
   <meta charset="UTF-8" />
   <title>Mecalc – Transportadores</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="./styles.css" />
 </head>
 
 <body>
+
 <header class="top">
   <div class="wrap">
     <h1>Mecalc</h1>
     <nav class="main-nav">
-      <a href="home.html">Home</a>
-      <a href="index.html">Pneumática</a>
-      <a href="transportadores.html" class="active">Transportadores</a>
-      <a href="normas.html">Normas</a>
+      <a href="./home.html">Home</a>
+      <a href="./index.html">Pneumática</a>
+      <a href="./transportadores.html" class="active">Transportadores</a>
+      <a href="./normas.html">Normas</a>
     </nav>
   </div>
 </header>
 
 <main class="wrap">
-<section class="card">
-  <h2>Cinemática do transportador (lona)</h2>
-  <p class="para">
-    Calcule o <b>RPM do tambor</b> a partir da velocidade, ou a <b>velocidade da lona</b> a partir do RPM.
-  </p>
 
-  <div class="grid-4">
-    <div class="field">
-      <label>Modo de cálculo</label>
-      <select id="cinMode">
-        <option value="v_to_rpm">Velocidade → RPM</option>
-        <option value="rpm_to_v">RPM → Velocidade</option>
-      </select>
+  <!-- =========================
+       Cinemática + Produção
+  ========================== -->
+  <section class="card">
+    <h2>Cinemática e produção (transportador de lona)</h2>
+    <p class="para">
+      Converta <b>RPM ↔ velocidade</b> do tambor e calcule <b>capacidade/velocidade</b> por produto + espaçamento.
+    </p>
+
+    <!-- Sub-bloco: Cinemática -->
+    <div style="margin-top:12px; padding-top:10px; border-top:1px solid rgba(255,255,255,.06);">
+      <h3 style="margin:0 0 10px 0; font-size:14px; color:var(--title);">Cinemática do tambor</h3>
+
+      <div class="grid-4">
+        <div class="field">
+          <label>Modo de cálculo</label>
+          <select id="cinMode">
+            <option value="v_to_rpm">Velocidade → RPM</option>
+            <option value="rpm_to_v">RPM → Velocidade</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label>Diâmetro do tambor (mm)</label>
+          <input id="cinDmm" type="number" step="0.1" placeholder="ex: 100">
+        </div>
+
+        <div class="field" id="cinVelWrap">
+          <label>Velocidade da lona</label>
+          <input id="cinVel" type="number" step="0.001" placeholder="ex: 0,5">
+        </div>
+
+        <div class="field" id="cinVelUnitWrap">
+          <label>Unidade da velocidade</label>
+          <select id="cinVelUnit">
+            <option value="ms">m/s</option>
+            <option value="mmin">m/min</option>
+          </select>
+        </div>
+
+        <div class="field" id="cinRpmWrap" style="display:none;">
+          <label>RPM do tambor</label>
+          <input id="cinRpm" type="number" step="0.1" placeholder="ex: 95,5">
+        </div>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn primary" id="cinCalcBtn">Calcular RPM/velocidade</button>
+        <button class="btn" id="cinClearBtn" type="button">Limpar</button>
+        <button class="btn" id="cinUseVelBtn" type="button">Usar velocidade no cálculo abaixo</button>
+      </div>
+
+      <div class="result-box" id="cinResult"></div>
     </div>
 
-    <div class="field">
-      <label>Diâmetro do tambor (mm)</label>
-      <input id="cinDmm" type="number" step="0.1" placeholder="ex: 100">
+    <!-- Sub-bloco: Produção -->
+    <div style="margin-top:18px; padding-top:14px; border-top:1px solid rgba(255,255,255,.06);">
+      <h3 style="margin:0 0 10px 0; font-size:14px; color:var(--title);">Velocidade e espaçamento de produtos</h3>
+
+      <div class="grid-4">
+        <div class="field">
+          <label>Comprimento do produto (mm)</label>
+          <input id="prodLen" type="number" step="0.1" placeholder="ex: 320">
+        </div>
+
+        <div class="field">
+          <label>Espaçamento entre produtos (mm)</label>
+          <input id="prodGap" type="number" step="0.1" placeholder="ex: 80">
+        </div>
+
+        <div class="field">
+          <label>Modo de cálculo</label>
+          <select id="prodMode">
+            <option value="capacity">Calcular capacidade (prod/min)</option>
+            <option value="speed">Calcular velocidade necessária</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label id="prodFourthLabel">Velocidade da esteira (m/min)</label>
+          <input id="prodFourth" type="number" step="0.01" placeholder="ex: 30">
+        </div>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn primary" id="prodCalcBtn">Calcular</button>
+        <button class="btn" id="prodClearBtn" type="button">Limpar</button>
+      </div>
+
+      <div class="result-box" id="prodResult"></div>
     </div>
+  </section>
 
-    <div class="field" id="cinVelWrap">
-      <label>Velocidade da lona</label>
-      <input id="cinVel" type="number" step="0.001" placeholder="ex: 0,5">
-    </div>
-
-    <div class="field" id="cinVelUnitWrap">
-      <label>Unidade da velocidade</label>
-      <select id="cinVelUnit">
-        <option value="ms">m/s</option>
-        <option value="mmin">m/min</option>
-      </select>
-    </div>
-
-    <div class="field" id="cinRpmWrap" style="display:none;">
-      <label>RPM do tambor</label>
-      <input id="cinRpm" type="number" step="0.1" placeholder="ex: 95,5">
-    </div>
-  </div>
-
-  <div class="btn-row">
-    <button class="btn primary" id="cinCalcBtn">Calcular</button>
-    <button class="btn" id="cinClearBtn" type="button">Limpar</button>
-  </div>
-
-  <div class="result-box" id="cinResult"></div>
-</section>
-
-  <!-- CARD 1 – TORQUE NO TAMBOR -->
+  <!-- =========================
+       Torque no tambor
+  ========================== -->
   <section class="card">
     <h2>Torque no tambor do transportador</h2>
 
-    <div class="torque-grid">
-      <label>
-        Massa total transportada (kg)
-        <input type="number" id="massaTransportada" placeholder="ex: 80" step="0.1" />
-      </label>
+    <div class="grid-4">
+      <div class="field">
+        <label>Massa total transportada (kg)</label>
+        <input id="torqueMass" type="number" step="0.1" placeholder="ex: 80">
+      </div>
 
-      <label>
-        Diâmetro do tambor (mm)
-        <input type="number" id="diametroTambor" placeholder="ex: 100" step="0.1" />
-      </label>
+      <div class="field">
+        <label>Diâmetro do tambor (mm)</label>
+        <input id="torqueDmm" type="number" step="0.1" placeholder="ex: 100">
+      </div>
 
-      <label>
-        Tipo de contato / atrito
-        <select id="tipoContatoAtrito">
-          <option value="">Selecione...</option>
-          <option value="0.60">Atrito deslizante aço sobre aço seco (μ = 0,60)</option>
-          <option value="0.50">Atrito deslizante de madeira sobre madeira (μ = 0,50)</option>
-          <option value="0.75">Atrito estático aço-plástico (μ = 0,75)</option>
-          <option value="0.45">Atrito estático entre plástico e aço (μ = 0,45)</option>
-          <option value="0.25">Atrito deslizante plástico sobre aço (μ = 0,25)</option>
-          <option value="0.35">Atrito deslizante aço sobre plástico (μ = 0,35)</option>
-        </select>
-      </label>
+      <div class="field">
+        <label>Tipo de contato / atrito</label>
+        <select id="fricType"></select>
+      </div>
 
-      <label>
-        Coeficiente de atrito (μ)
-        <input type="text" id="coefAtrito" placeholder="ex: 0,45" readonly />
-      </label>
-
-      <button type="button" id="calcularTorqueTambor">Calcular torque</button>
-      <button type="button" id="limparTorqueTambor">Limpar</button>
+      <div class="field">
+        <label>Coeficiente de atrito (μ)</label>
+        <input id="fricMu" type="number" step="0.01" placeholder="ex: 0,45">
+      </div>
     </div>
 
-    <div id="resultadoTorqueTambor" class="result"></div>
+    <div class="btn-row">
+      <button class="btn primary" id="torqueCalcBtn">Calcular torque</button>
+      <button class="btn" id="torqueClearBtn" type="button">Limpar</button>
+    </div>
+
+    <div class="result-box" id="torqueResult"></div>
   </section>
 
-  <!-- CARD 2 – POTÊNCIA DO TRANSPORTADOR -->
+  <!-- =========================
+       Potência
+  ========================== -->
   <section class="card">
     <h2>Potência do transportador</h2>
-
-    <p class="para" style="margin-bottom:6px;">
-      Utilize o mesmo <b>coeficiente de atrito (μ)</b> definido acima. Este cálculo considera
-      o esforço médio em regime permanente (sem acelerações bruscas).
+    <p class="para">
+      Usa o mesmo coeficiente de atrito (μ) definido acima. Cálculo em regime permanente (sem acelerações bruscas).
     </p>
 
-    <div class="torque-grid">
-      <label>
-        Massa total transportada (kg)
-        <input type="number" id="massaPotencia" placeholder="ex: 80" step="0.1" />
-      </label>
+    <div class="grid-4">
+      <div class="field">
+        <label>Massa total transportada (kg)</label>
+        <input id="powMass" type="number" step="0.1" placeholder="ex: 80">
+      </div>
 
-      <label>
-        Tipo de transportador
-        <select id="tipoTransportador">
+      <div class="field">
+        <label>Tipo de transportador</label>
+        <select id="powType">
           <option value="horizontal">Horizontal</option>
           <option value="inclinado">Inclinado</option>
         </select>
-      </label>
+      </div>
 
-      <label>
-        Ângulo em relação à horizontal (°)
-        <input type="number" id="anguloTransportador" placeholder="ex: 12" step="0.1" />
-      </label>
+      <div class="field">
+        <label>Ângulo em relação à horizontal (°)</label>
+        <input id="powAngle" type="number" step="0.1" placeholder="ex: 12">
+      </div>
 
-      <label>
-        Velocidade do transportador
-        <input type="number" id="velocidadeValor" placeholder="ex: 0,5" step="0.01" />
-      </label>
+      <div class="field">
+        <label>Velocidade do transportador</label>
+        <input id="powVel" type="number" step="0.001" placeholder="ex: 0,5">
+      </div>
 
-      <label>
-        Unidade da velocidade
-        <select id="velocidadeUnidade">
+      <div class="field">
+        <label>Unidade da velocidade</label>
+        <select id="powVelUnit">
           <option value="ms">m/s</option>
           <option value="mmin">m/min</option>
         </select>
-      </label>
+      </div>
 
-      <label>
-        Rendimento global (η)
-        <select id="rendimentoSelect">
-          <option value="0.75">0,75 – pesado / esteira longa</option>
+      <div class="field">
+        <label>Rendimento global (η)</label>
+        <select id="powEta">
+          <option value="0.90">0,90 – ótimo</option>
+          <option value="0.85">0,85 – bom</option>
           <option value="0.80" selected>0,80 – típico</option>
-          <option value="0.85">0,85 – leve / bem alinhado</option>
-          <option value="custom">Personalizado</option>
+          <option value="0.75">0,75 – conservador</option>
         </select>
-      </label>
-
-      <label id="rendimentoCustomWrapper" style="display:none;">
-        Rendimento personalizado (0–1)
-        <input type="number" id="rendimentoCustom" placeholder="ex: 0,9" step="0.01" />
-      </label>
-
-      <button type="button" id="calcularPotenciaTransportador">Calcular potência</button>
-      <button type="button" id="limparPotenciaTransportador">Limpar</button>
+      </div>
     </div>
 
-    <div id="resultadoPotenciaTransportador" class="result"></div>
-
-    <p class="para" style="font-size:12px; color:var(--muted); margin-top:10px;">
-      Dica: para partidas frequentes, impacto ou operação pesada,
-      considere utilizar fator de segurança no motor (próximo tamanho comercial acima
-      e/ou uso de inversor de frequência com rampas suaves).
-    </p>
-  </section>
-
-  <!-- CARD 3 – VELOCIDADE E ESPAÇAMENTO DE PRODUTOS -->
-  <section class="card">
-    <h2>Velocidade e espaçamento de produtos</h2>
-
-    <p class="para" style="margin-bottom:6px;">
-      Calcule a <b>capacidade em produtos/min</b> a partir da velocidade, ou descubra
-      a <b>velocidade necessária</b> para uma capacidade desejada, considerando
-      comprimento do produto e espaçamento entre itens.
-    </p>
-
-    <div class="torque-grid">
-      <label>
-        Comprimento do produto (mm)
-        <input type="number" id="prodComprimento" placeholder="ex: 320" step="0.1" />
-      </label>
-
-      <label>
-        Espaçamento entre produtos (mm)
-        <input type="number" id="prodEspacamento" placeholder="ex: 80" step="0.1" />
-      </label>
-
-      <label>
-        Modo de cálculo
-        <select id="modoVelocidade">
-          <option value="capacidade">Calcular capacidade (prod/min)</option>
-          <option value="velocidade">Calcular velocidade necessária</option>
-        </select>
-      </label>
-
-      <label id="velocEsteiraWrapper">
-        Velocidade da esteira (m/min)
-        <input type="number" id="velocEsteira" placeholder="ex: 30" step="0.1" />
-      </label>
-
-      <label id="capacidadeDesejadaWrapper" style="display:none;">
-        Capacidade desejada (prod/min)
-        <input type="number" id="capacidadeDesejada" placeholder="ex: 40" step="0.1" />
-      </label>
-
-      <button type="button" id="calcularVelocidadeProdutos">Calcular</button>
-      <button type="button" id="limparVelocidadeProdutos">Limpar</button>
+    <div class="btn-row">
+      <button class="btn primary" id="powCalcBtn">Calcular potência</button>
+      <button class="btn" id="powClearBtn" type="button">Limpar</button>
     </div>
 
-    <div id="resultadoVelocidadeProdutos" class="result"></div>
+    <div class="result-box" id="powResult"></div>
   </section>
 
 </main>
 
-<footer class="wrap" style="margin:30px 0; text-align:center; font-size:12px;">
-  © 2025 Mecalc — Ferramentas para Engenharia Mecânica
-</footer>
-
-<script src="transportadores.js"></script>
+<script src="./transportadores.js"></script>
 </body>
 </html>
-
-
