@@ -380,6 +380,46 @@ document.addEventListener("DOMContentLoaded", function () {
   const btnCalc = document.getElementById("cinCalcBtn");
   const btnClear = document.getElementById("cinClearBtn");
   const out = document.getElementById("cinResult");
+    const useVelBtn = document.getElementById("cinUseVelBtn");
+  const prodFourth = document.getElementById("prodFourth");
+  const prodMode = document.getElementById("prodMode");
+  const prodFourthLabel = document.getElementById("prodFourthLabel");
+
+  // mostrar o botão só quando existir o bloco de produção
+  if(useVelBtn && prodFourth && prodMode && prodFourthLabel){
+    useVelBtn.style.display = "inline-flex";
+
+    useVelBtn.addEventListener("click", () => {
+      // pega a última velocidade calculada no modo rpm_to_v e joga em m/min
+      // se estiver em v_to_rpm, usa a velocidade digitada (convertida)
+      const Dmm = toNumber(dmm);
+      if(!isFinite(Dmm) || Dmm <= 0) return;
+
+      const Dm = Dmm / 1000;
+
+      let v_ms = NaN;
+      if(mode.value === "v_to_rpm"){
+        let v = toNumber(vel);
+        if(!isFinite(v) || v <= 0) return;
+        if(velUnit.value === "mmin") v = v / 60;
+        v_ms = v;
+      }else{
+        const RPM = toNumber(rpm);
+        if(!isFinite(RPM) || RPM <= 0) return;
+        v_ms = (Math.PI * Dm * RPM) / 60;
+      }
+
+      const v_mmin = v_ms * 60;
+
+      // força o modo "capacidade" (porque precisa da velocidade)
+      prodMode.value = "capacity";
+      // label e placeholder ficam como velocidade
+      prodFourthLabel.textContent = "Velocidade da esteira (m/min)";
+      prodFourth.placeholder = "ex: 30";
+      prodFourth.value = v_mmin.toFixed(2).replace(".", ",");
+    });
+  }
+
 
   if(!mode || !dmm || !vel || !velUnit || !rpm || !btnCalc || !btnClear || !out) return;
 
@@ -469,5 +509,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
   showMode();
 })();
+
 
 
