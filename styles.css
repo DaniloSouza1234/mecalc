@@ -1,216 +1,233 @@
-:root{
-  --bg: #0b0d12;
-  --card: rgba(18,20,27,.78);
-  --border: rgba(255,255,255,.08);
+:root {
+  --bg: #050507;
+  --card: #111119;
+  --border: #30303a;
+  --text: #dddddd;
+  --muted: #aaaaaa;
   --title: #ffffff;
-  --text: rgba(255,255,255,.90);
-  --muted: rgba(255,255,255,.68);
-  --accent: #e23b3b;
+  --button-bg: #e63946;
+  --button-hover: #ff5c6a;
+  --input-bg: #050509;
 }
 
-*{ box-sizing:border-box; }
-html,body{ margin:0; padding:0; }
-body{
-  font-family: system-ui, -apple-system, Segoe UI, Arial;
-  background: radial-gradient(1200px 600px at 20% 0%, rgba(226,59,59,.18), transparent 60%),
-              radial-gradient(1200px 600px at 80% 10%, rgba(255,255,255,.06), transparent 55%),
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+  background: radial-gradient(1200px 600px at 10% 10%, rgba(230,57,70,.20), transparent 60%),
+              radial-gradient(900px 500px at 90% 10%, rgba(230,57,70,.16), transparent 55%),
               var(--bg);
   color: var(--text);
 }
 
-.wrap{
-  width: min(1200px, calc(100% - 28px));
+.wrap {
+  width: min(1100px, 92vw);
   margin: 0 auto;
 }
 
-.top{
-  position: sticky;
-  top: 0;
-  z-index: 50;
-  background: rgba(10,12,16,.72);
-  border-bottom: 1px solid var(--border);
-  backdrop-filter: blur(10px);
-}
-.top .wrap{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  padding: 14px 0;
-}
-h1{
-  margin:0;
-  font-size: 20px;
-  letter-spacing:.3px;
+/* HEADER */
+.top {
+  padding: 16px 0;
 }
 
-.main-nav a{
-  color: var(--muted);
-  text-decoration:none;
-  margin-left: 14px;
-  font-weight: 600;
-}
-.main-nav a.active{ color: var(--title); }
-.main-nav a:hover{ color: var(--title); }
-
-main{ padding: 18px 0 40px; }
-
-.card{
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: 16px;
-  padding: 16px 16px 18px;
-  box-shadow: 0 10px 26px rgba(0,0,0,.35);
-  margin-top: 16px;
-}
-
-h2{
-  margin: 0 0 10px;
-  font-size: 18px;
-  color: var(--title);
-}
-
-.para{
+.top h1 {
   margin: 0;
-  color: var(--muted);
-  line-height: 1.5;
+  color: var(--title);
+  font-size: 22px;
+  font-weight: 800;
 }
 
-label{
-  display:block;
+/* NAV */
+.main-nav {
+  margin-top: 8px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.main-nav a {
+  font-size: 13px;
+  text-decoration: none;
+  padding: 6px 12px;
+  border-radius: 20px;
+  border: 1px solid var(--border);
+  color: var(--text);
+  background: rgba(0,0,0,.18);
+}
+
+.main-nav a.active {
+  border-color: rgba(226,59,59,.55);
+  background: linear-gradient(180deg, rgba(226,59,59,.95), rgba(190,34,34,.95));
+  color: white;
+  font-weight: 800;
+}
+
+/* CARD */
+.card {
+  background: rgba(17,17,25,.82);
+  border-radius: 14px;
+  border: 1px solid var(--border);
+  padding: 14px 16px;
+  margin-top: 14px;
+  box-shadow: 0 0 14px rgba(0, 0, 0, 0.6);
+}
+
+.card h2 {
+  margin: 0 0 6px 0;
+  color: var(--title);
+  font-size: 16px;
+  font-weight: 800;
+}
+
+.para {
+  margin: 6px 0;
+  color: rgba(255,255,255,.88);
+  line-height: 1.55;
+}
+
+/* GRID DE CAMPOS */
+.torque-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 10px 14px;
+  margin-top: 8px;
+}
+
+.card label {
+  display: block;
   font-size: 12px;
   color: var(--muted);
+  font-weight: 800;
 }
 
-input, select, button{
+.card input, .card select {
   width: 100%;
-  margin-top: 6px;
-  height: 38px;
+  height: 40px;
   border-radius: 10px;
   border: 1px solid var(--border);
   background: rgba(0,0,0,.22);
   color: var(--title);
-  padding: 0 10px;
+  padding: 0 12px;
+  font-weight: 800;
   outline: none;
+  margin-top: 6px;
 }
 
-button{
-  cursor: pointer;
-  border: 1px solid rgba(226,59,59,.45);
+.card button {
+  height: 40px;
+  border-radius: 10px;
+  border: 1px solid rgba(255,255,255,.10);
   background: linear-gradient(180deg, rgba(226,59,59,.95), rgba(190,34,34,.95));
-  font-weight: 800;
+  color: white;
+  font-weight: 900;
+  cursor: pointer;
+  padding: 0 14px;
 }
-button:hover{
+
+.card button:hover {
   filter: brightness(1.05);
 }
 
-.torque-grid{
-  display:grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 12px;
+/* RESULT */
+.result {
+  margin-top: 10px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,.10);
+  background: rgba(0,0,0,.18);
+  line-height: 1.6;
 }
 
-@media (max-width: 900px){
-  .torque-grid{ grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.result-warning {
+  border-color: rgba(255,213,74,.35);
+  background: rgba(255,213,74,.06);
 }
 
-table{
+/* CONTROLS */
+.controls {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 10px;
+  align-items: flex-end;
+}
+
+.controls label {
+  min-width: 200px;
+}
+
+/* TABELA PNEUMÁTICA */
+#forceTable {
   width: 100%;
   border-collapse: collapse;
-  min-width: 820px;
-  border: 1px solid var(--border);
-  border-radius: 14px;
-  overflow:hidden;
-}
-
-thead th{
-  position: sticky;
-  top: 0;
-  background: rgba(226,59,59,.18);
-  color: var(--title);
-  font-size: 12px;
-  padding: 10px 8px;
-  border-bottom: 1px solid var(--border);
-  text-align:center;
-}
-
-tbody td{
-  padding: 10px 8px;
-  border-bottom: 1px solid rgba(255,255,255,.06);
-  text-align:center;
-  font-size: 12px;
-  color: rgba(255,255,255,.88);
-}
-
-tbody tr:hover{
-  background: rgba(255,255,255,.03);
-}
-
-.highlight-row{
-  background: rgba(226,59,59,.08);
-}
-
-.highlight-pressure{
-  background: rgba(226,59,59,.25) !important;
-}
-
-.highlight-cell{
-  outline: 2px solid rgba(255,213,74,.9);
-  outline-offset: -2px;
-  border-radius: 10px;
-  background: rgba(255,213,74,.12);
-}
-
-.result{
-  margin-top: 12px;
-  padding: 12px;
-  border-radius: 14px;
-  border: 1px solid rgba(255,255,255,.08);
-  background: rgba(0,0,0,.18);
-  color: rgba(255,255,255,.92);
-  line-height: 1.55;
-}
-
-.result-warning{
-  border-color: rgba(255,213,74,.45) !important;
-}
-
-/* ================== BLOCO DO DIAGRAMA θ0/θ1 ================== */
-.theta-help{
   margin-top: 10px;
-  padding: 12px;
-  border-radius: 14px;
+  font-size: 13px;
+}
+
+#forceTable th,
+#forceTable td {
   border: 1px solid var(--border);
-  background: rgba(0,0,0,0.18);
+  padding: 4px 6px;
+  text-align: center;
 }
 
-.theta-help-head{
-  margin-bottom: 10px;
+#forceTable th {
+  background: #181820;
+  font-weight: 600;
 }
 
-.theta-title{
+#forceTable tr:nth-child(even) td {
+  background: rgba(255,255,255,.02);
+}
+
+.row-selected td:first-child {
+  outline: 2px solid rgba(226,59,59,.55);
+}
+
+.cell-selected {
+  outline: 2px solid rgba(226,59,59,.55);
+  background: rgba(226,59,59,.10);
+}
+
+/* HOME: título + typing */
+.site-title {
+  font-size: 26px;
   font-weight: 800;
   color: var(--title);
-  margin-bottom: 6px;
+  display: inline-block;
 }
 
-.theta-sub{
-  font-size: 13px;
-  line-height: 1.45;
-  color: var(--muted);
-}
+/* (… resto do seu CSS permanece …) */
 
-.theta-diagram-wrap{
-  border-radius: 12px;
-  border: 1px solid rgba(255,255,255,0.08);
-  padding: 10px;
-  background: rgba(0,0,0,0.12);
-  overflow: hidden;
-}
 
-.theta-diagram{
-  width: 100%;
-  height: auto;
-  display: block;
-  max-width: 900px;
-  margin: 0 auto;
+/* TABELA – CONSUMO PNEUMÁTICO */
+#airTable{
+  width:100%;
+  border-collapse:collapse;
+  margin-top: 0;
+  font-size:13px;
+}
+#airTable th,#airTable td{
+  border:1px solid var(--border);
+  padding:6px 6px;
+  text-align:center;
+  white-space:nowrap;
+}
+#airTable th{
+  background:#181820;
+  font-weight:600;
+}
+#airTable input{
+  width: 92px;
+  height: 30px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: rgba(0,0,0,.22);
+  color: var(--title);
+  padding: 0 8px;
+  font-weight: 800;
+  outline: none;
 }
