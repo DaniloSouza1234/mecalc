@@ -1,370 +1,66 @@
-document.addEventListener("DOMContentLoaded", function () {
-
-  const g = 9.81;
-
-  function parsePT(v) {
-    if (v == null) return NaN;
-    const s = String(v).trim().replace(",", ".");
-    return s ? Number(s) : NaN;
-  }
-
-  function formatNumber(v, dec) {
-    return Number(v).toFixed(dec).replace(".", ",");
-  }
-
-  // ======== TORQUE NO TAMBOR ========
-  const massaTransportadaInput = document.getElementById("massaTransportada");
-  const diametroTamborInput   = document.getElementById("diametroTambor");
-  const tipoContatoAtritoSel  = document.getElementById("tipoContatoAtrito");
-  const coefAtritoInput       = document.getElementById("coefAtrito");
-  const calcTorqueBtn         = document.getElementById("calcularTorqueTambor");
-  const limparTorqueBtn       = document.getElementById("limparTorqueTambor");
-  const resultadoTorqueDiv    = document.getElementById("resultadoTorqueTambor");
-
-  if (tipoContatoAtritoSel && coefAtritoInput) {
-    tipoContatoAtritoSel.addEventListener("change", function () {
-      const mu = parsePT(this.value);
-      if (isFinite(mu)) {
-        coefAtritoInput.value = formatNumber(mu, 2);
-      } else {
-        coefAtritoInput.value = "";
-      }
-    });
-  }
-
-  function calcularTorqueTambor() {
-    if (!resultadoTorqueDiv) return;
-    resultadoTorqueDiv.className = "result";
-
-    const m   = parsePT(massaTransportadaInput.value);
-    const Dmm = parsePT(diametroTamborInput.value);
-    const mu  = parsePT(coefAtritoInput.value);
-
-    if (!isFinite(m) || m <= 0 ||
-        !isFinite(Dmm) || Dmm <= 0 ||
-        !isFinite(mu) || mu <= 0) {
-      resultadoTorqueDiv.innerHTML = "Preencha massa, diâmetro e coeficiente de atrito (μ) com valores válidos.";
-      return;
-    }
-
-    const F = mu * m * g;                // N
-    const F_kgf = F / 9.80665;
-
-    const r = (Dmm / 1000) / 2;          // m
-    const T_Nm   = F * r;
-    const T_kgfm = T_Nm / 9.80665;
-
-    let html =
-      `Força tangencial no tambor: <b>${formatNumber(F,2)} N</b> ` +
-      `(≈ <b>${formatNumber(F_kgf,2)} kgf</b>).<br>` +
-      `Torque no tambor: <b>${formatNumber(T_Nm,2)} N·m</b> ` +
-      `(≈ <b>${formatNumber(T_kgfm,3)} kgf·m</b>).`;
-
-    resultadoTorqueDiv.innerHTML = html;
-  }
-
-  function limparTorqueTambor() {
-    if (massaTransportadaInput) massaTransportadaInput.value = "";
-    if (diametroTamborInput)   diametroTamborInput.value   = "";
-    if (tipoContatoAtritoSel)  tipoContatoAtritoSel.value  = "";
-    if (coefAtritoInput)       coefAtritoInput.value       = "";
-    if (resultadoTorqueDiv) {
-      resultadoTorqueDiv.className = "result";
-      resultadoTorqueDiv.innerHTML = "";
-    }
-  }
-
-  if (calcTorqueBtn)  calcTorqueBtn.addEventListener("click", calcularTorqueTambor);
-  if (limparTorqueBtn)limparTorqueBtn.addEventListener("click", limparTorqueTambor);
-
-  // ======== POTÊNCIA DO TRANSPORTADOR ========
-  const massaPotenciaInput      = document.getElementById("massaPotencia");
-  const tipoTransportadorSelect = document.getElementById("tipoTransportador");
-  const anguloTransportadorInput= document.getElementById("anguloTransportador");
-  const velocidadeValorInput    = document.getElementById("velocidadeValor");
-  const velocidadeUnidadeSelect = document.getElementById("velocidadeUnidade");
-  const rendimentoSelect        = document.getElementById("rendimentoSelect");
-  const rendimentoCustomWrapper = document.getElementById("rendimentoCustomWrapper");
-  const rendimentoCustomInput   = document.getElementById("rendimentoCustom");
-  const calcPotenciaBtn         = document.getElementById("calcularPotenciaTransportador");
-  const limparPotenciaBtn       = document.getElementById("limparPotenciaTransportador");
-  const resultadoPotenciaDiv    = document.getElementById("resultadoPotenciaTransportador");
-
-  if (rendimentoSelect && rendimentoCustomWrapper) {
-    rendimentoSelect.addEventListener("change", function () {
-      if (this.value === "custom") {
-        rendimentoCustomWrapper.style.display = "";
-      } else {
-        rendimentoCustomWrapper.style.display = "none";
-        if (rendimentoCustomInput) rendimentoCustomInput.value = "";
-      }
-    });
-  }
-
-  function sugerirMotorPadrao(P_motor_kW) {
-    const padroes = [0.18, 0.25, 0.37, 0.55, 0.75, 1.1, 1.5, 2.2, 3, 4, 5.5, 7.5];
-    let escolhido = padroes[0];
-    for (const p of padroes) {
-      if (P_motor_kW <= p) {
-        escolhido = p;
-        break;
-      }
-    }
-    const cv = escolhido * 1000 / 735.5;
-    return {
-      kW: escolhido,
-      cv: cv
-    };
-  }
-
-  function calcularPotenciaTransportador() {
-    if (!resultadoPotenciaDiv) return;
-    resultadoPotenciaDiv.className = "result";
-
-    // Massa: se o campo estiver vazio, tenta usar o do torque
-    let m = parsePT(massaPotenciaInput.value);
-    if (!isFinite(m) || m <= 0) {
-      m = parsePT(massaTransportadaInput ? massaTransportadaInput.value : "");
-    }
-    const mu = parsePT(coefAtritoInput ? coefAtritoInput.value : "");
-
-    const tipo = tipoTransportadorSelect ? tipoTransportadorSelect.value : "horizontal";
-    let angDeg = parsePT(anguloTransportadorInput.value);
-    if (!isFinite(angDeg)) angDeg = 0;
-
-    const vVal = parsePT(velocidadeValorInput.value);
-    const velUnit = velocidadeUnidadeSelect ? velocidadeUnidadeSelect.value : "ms";
-
-    // rendimento
-    let eta = 1.0;
-    if (rendimentoSelect) {
-      if (rendimentoSelect.value === "custom") {
-        eta = parsePT(rendimentoCustomInput.value);
-      } else {
-        eta = parsePT(rendimentoSelect.value);
-      }
-    }
-
-    if (!isFinite(m) || m <= 0 ||
-        !isFinite(mu) || mu <= 0 ||
-        !isFinite(vVal) || vVal <= 0) {
-      resultadoPotenciaDiv.innerHTML = "Preencha massa, coeficiente de atrito e velocidade com valores válidos.";
-      return;
-    }
-
-    if (!isFinite(eta) || eta <= 0 || eta > 1) {
-      resultadoPotenciaDiv.innerHTML = "Informe um rendimento global (η) entre 0 e 1.";
-      return;
-    }
-
-    // velocidade em m/s e m/min
-    let v_ms, v_mmin;
-    if (velUnit === "mmin") {
-      v_mmin = vVal;
-      v_ms   = vVal / 60.0;
-    } else {
-      v_ms   = vVal;
-      v_mmin = vVal * 60.0;
-    }
-
-    // Força total
-    let F;
-    if (tipo === "inclinado") {
-      const angRad = angDeg * Math.PI / 180.0;
-      const F_fric = mu * m * g * Math.cos(angRad);
-      const F_grav = m * g * Math.sin(angRad);
-      F = F_fric + F_grav;
-    } else {
-      F = mu * m * g;
-      angDeg = 0;
-    }
-
-    const F_kgf = F / 9.80665;
-
-    // Potências
-    const P_eixo_W  = F * v_ms;
-    const P_eixo_kW = P_eixo_W / 1000.0;
-    const P_eixo_cv = P_eixo_W / 735.5;
-
-    const P_motor_W  = P_eixo_W / eta;
-    const P_motor_kW = P_motor_W / 1000.0;
-    const P_motor_cv = P_motor_W / 735.5;
-
-    // Sugestão de motor padrão
-    const motorSugerido = sugerirMotorPadrao(P_motor_kW);
-
-    // Check de segurança: margem entre cálculo e motor sugerido
-    const ratio     = motorSugerido.kW / P_motor_kW;      // ex.: 1,3 → 130% da potência calculada
-    const percTotal = ratio * 100.0;                      // % da potência mínima
-    const marginPct = (ratio - 1.0) * 100.0;              // % acima do mínimo
-
-    let html =
-      `Força total no tambor: <b>${formatNumber(F,2)} N</b> ` +
-      `(≈ <b>${formatNumber(F_kgf,2)} kgf</b>).<br>` +
-      `Velocidade: <b>${formatNumber(v_ms,3)} m/s</b> ` +
-      `(≈ <b>${formatNumber(v_mmin,1)} m/min</b>).<br><br>` +
-
-      `Potência no tambor (sem perdas): <b>${formatNumber(P_eixo_kW,3)} kW</b> ` +
-      `(≈ <b>${formatNumber(P_eixo_cv,3)} cv</b>).<br>` +
-      `Potência requerida no motor (com η = ${formatNumber(eta,2)}): ` +
-      `<b>${formatNumber(P_motor_kW,3)} kW</b> ` +
-      `(≈ <b>${formatNumber(P_motor_cv,3)} cv</b>).<br><br>` +
-
-      `Sugestão de motor: escolha ≥ <b>${formatNumber(motorSugerido.kW,2)} kW</b> ` +
-      `(≈ <b>${formatNumber(motorSugerido.cv,2)} cv</b>).<br>` +
-      `Este motor fornece cerca de <b>${formatNumber(percTotal,1)}%</b> da potência mínima calculada ` +
-      `(margem ≈ <b>${formatNumber(marginPct,1)}%</b> acima do mínimo).`;
-
-    if (marginPct < 20) {
-      resultadoPotenciaDiv.classList.add("result-warning");
-      html +=
-        "<br><br>⚠ <b>Atenção:</b> margem de segurança baixa. " +
-        "Considere um motor de potência superior ou revisar massa, atrito e rendimento.";
-    } else {
-      resultadoPotenciaDiv.innerHTML = html +
-        "<br>Considere ainda fatores de serviço adicionais conforme ciclos, partidas frequentes e impactos.";
-      return;
-    }
-
-    resultadoPotenciaDiv.innerHTML = html;
-  }
-
-  function limparPotenciaTransportador() {
-    if (massaPotenciaInput)      massaPotenciaInput.value = "";
-    if (tipoTransportadorSelect) tipoTransportadorSelect.value = "horizontal";
-    if (anguloTransportadorInput)anguloTransportadorInput.value = "";
-    if (velocidadeValorInput)    velocidadeValorInput.value = "";
-    if (velocidadeUnidadeSelect) velocidadeUnidadeSelect.value = "ms";
-    if (rendimentoSelect)        rendimentoSelect.value = "0.80";
-    if (rendimentoCustomWrapper) rendimentoCustomWrapper.style.display = "none";
-    if (rendimentoCustomInput)   rendimentoCustomInput.value = "";
-    if (resultadoPotenciaDiv) {
-      resultadoPotenciaDiv.className = "result";
-      resultadoPotenciaDiv.innerHTML = "";
-    }
-  }
-
-  if (calcPotenciaBtn)  calcPotenciaBtn.addEventListener("click", calcularPotenciaTransportador);
-  if (limparPotenciaBtn)limparPotenciaBtn.addEventListener("click", limparPotenciaTransportador);
-
-  // ======== VELOCIDADE E ESPAÇAMENTO DE PRODUTOS ========
-  const prodComprimentoInput       = document.getElementById("prodComprimento");
-  const prodEspacamentoInput       = document.getElementById("prodEspacamento");
-  const modoVelocidadeSelect       = document.getElementById("modoVelocidade");
-  const velocEsteiraWrapper        = document.getElementById("velocEsteiraWrapper");
-  const capacidadeDesejadaWrapper  = document.getElementById("capacidadeDesejadaWrapper");
-  const velocEsteiraInput          = document.getElementById("velocEsteira");
-  const capacidadeDesejadaInput    = document.getElementById("capacidadeDesejada");
-  const calcVelocidadeBtn          = document.getElementById("calcularVelocidadeProdutos");
-  const limparVelocidadeBtn        = document.getElementById("limparVelocidadeProdutos");
-  const resultadoVelocidadeDiv     = document.getElementById("resultadoVelocidadeProdutos");
-
-  function atualizarModoVelocidade() {
-    if (!modoVelocidadeSelect) return;
-    const modo = modoVelocidadeSelect.value;
-    if (!velocEsteiraWrapper || !capacidadeDesejadaWrapper) return;
-
-    if (modo === "capacidade") {
-      velocEsteiraWrapper.style.display       = "";
-      capacidadeDesejadaWrapper.style.display = "none";
-      if (capacidadeDesejadaInput) capacidadeDesejadaInput.value = "";
-    } else {
-      velocEsteiraWrapper.style.display       = "none";
-      capacidadeDesejadaWrapper.style.display = "";
-      if (velocEsteiraInput) velocEsteiraInput.value = "";
-    }
-  }
-
-  if (modoVelocidadeSelect) {
-    modoVelocidadeSelect.addEventListener("change", atualizarModoVelocidade);
-    atualizarModoVelocidade();
-  }
-
-  function calcularVelocidadeProdutos() {
-    if (!resultadoVelocidadeDiv) return;
-    resultadoVelocidadeDiv.className = "result";
-
-    const Lmm = parsePT(prodComprimentoInput.value);
-    const Gmm = parsePT(prodEspacamentoInput.value);
-
-    if (!isFinite(Lmm) || Lmm <= 0 || !isFinite(Gmm) || Gmm < 0) {
-      resultadoVelocidadeDiv.innerHTML =
-        "Informe comprimento do produto (> 0) e espaçamento (≥ 0) em mm.";
-      return;
-    }
-
-    const passo_m = (Lmm + Gmm) / 1000.0; // passo total entre frentes (m)
-
-    if (passo_m <= 0) {
-      resultadoVelocidadeDiv.innerHTML = "Passo total inválido. Verifique comprimento e espaçamento.";
-      return;
-    }
-
-    const modo = modoVelocidadeSelect ? modoVelocidadeSelect.value : "capacidade";
-
-    if (modo === "capacidade") {
-      const v_mmin = parsePT(velocEsteiraInput.value);
-      if (!isFinite(v_mmin) || v_mmin <= 0) {
-        resultadoVelocidadeDiv.innerHTML =
-          "Informe a velocidade da esteira em m/min (maior que zero).";
-        return;
-      }
-
-      const PPM = v_mmin / passo_m;       // produtos/min
-      const tempoEntre_s = 60.0 / PPM;    // s entre entradas
-      const v_ms = v_mmin / 60.0;
-
-      let html =
-        `Passo total (produto + espaçamento): <b>${formatNumber(passo_m,3)} m</b>.<br>` +
-        `Velocidade da esteira: <b>${formatNumber(v_ms,3)} m/s</b> ` +
-        `(≈ <b>${formatNumber(v_mmin,1)} m/min</b>).<br>` +
-        `Capacidade aproximada: <b>${formatNumber(PPM,1)} produtos/min</b>.<br>` +
-        `Tempo entre produtos: <b>${formatNumber(tempoEntre_s,2)} s</b>.`;
-
-      resultadoVelocidadeDiv.innerHTML = html;
-    } else {
-      const PPM = parsePT(capacidadeDesejadaInput.value);
-      if (!isFinite(PPM) || PPM <= 0) {
-        resultadoVelocidadeDiv.innerHTML =
-          "Informe uma capacidade desejada em produtos/min (maior que zero).";
-        return;
-      }
-
-      const v_mmin = PPM * passo_m;
-      const v_ms   = v_mmin / 60.0;
-      const tempoEntre_s = 60.0 / PPM;
-
-      let html =
-        `Passo total (produto + espaçamento): <b>${formatNumber(passo_m,3)} m</b>.<br>` +
-        `Capacidade desejada: <b>${formatNumber(PPM,1)} produtos/min</b>.<br>` +
-        `Velocidade necessária da esteira: <b>${formatNumber(v_ms,3)} m/s</b> ` +
-        `(≈ <b>${formatNumber(v_mmin,1)} m/min</b>).<br>` +
-        `Tempo entre produtos: <b>${formatNumber(tempoEntre_s,2)} s</b>.`;
-
-      resultadoVelocidadeDiv.innerHTML = html;
-    }
-  }
-
-  function limparVelocidadeProdutos() {
-    if (prodComprimentoInput)      prodComprimentoInput.value = "";
-    if (prodEspacamentoInput)      prodEspacamentoInput.value = "";
-    if (modoVelocidadeSelect)      modoVelocidadeSelect.value = "capacidade";
-    if (velocEsteiraInput)         velocEsteiraInput.value = "";
-    if (capacidadeDesejadaInput)   capacidadeDesejadaInput.value = "";
-    if (resultadoVelocidadeDiv) {
-      resultadoVelocidadeDiv.className = "result";
-      resultadoVelocidadeDiv.innerHTML = "";
-    }
-    atualizarModoVelocidade();
-  }
-
-  if (calcVelocidadeBtn)  calcVelocidadeBtn.addEventListener("click", calcularVelocidadeProdutos);
-  if (limparVelocidadeBtn)limparVelocidadeBtn.addEventListener("click", limparVelocidadeProdutos);
-
-});
 // =============================
-// Cinemática (lona): modo C
-// RPM do tambor <-> velocidade
+// Helpers gerais
+// =============================
+const G = 9.80665; // m/s²
+
+function toNumber(v) {
+  if (v === null || v === undefined) return NaN;
+  const s = String(v).trim().replace(",", ".");
+  const n = parseFloat(s);
+  return Number.isFinite(n) ? n : NaN;
+}
+
+function fmt(n, dec = 2) {
+  if (!Number.isFinite(n)) return "—";
+  return n.toLocaleString("pt-BR", { minimumFractionDigits: dec, maximumFractionDigits: dec });
+}
+
+function degToRad(deg) {
+  return (deg * Math.PI) / 180;
+}
+
+// =============================
+// Tabela de atrito (seleção)
+// =============================
+const FRICTION_LIST = [
+  { label: "Atrito estático aço sobre aço a seco", mu: 0.60 },
+  { label: "Atrito deslizante aço sobre aço seco", mu: 0.50 },
+  { label: "Aço sobre aço – fricção estática lubrificada", mu: 0.35 },
+  { label: "Aço sobre aço – deslizamento lubrificado", mu: 0.25 },
+  { label: "Atrito estático entre madeira e aço", mu: 0.75 },
+  { label: "Atrito deslizante de madeira sobre aço", mu: 0.60 },
+  { label: "Atrito estático madeira-madeira", mu: 0.75 },
+  { label: "Atrito de deslizamento madeira sobre madeira", mu: 0.50 },
+  { label: "Atrito estático entre plástico e aço", mu: 0.45 },
+  { label: "Atrito deslizante de plástico sobre aço", mu: 0.25 },
+  { label: "Atrito estático aço-plástico", mu: 0.45 },
+  { label: "Atrito deslizante aço sobre plástico", mu: 0.35 },
+];
+
+function initFrictionSelect() {
+  const sel = document.getElementById("fricType");
+  const muInput = document.getElementById("fricMu");
+  if (!sel || !muInput) return;
+
+  sel.innerHTML = "";
+  FRICTION_LIST.forEach((it, idx) => {
+    const opt = document.createElement("option");
+    opt.value = String(it.mu);
+    opt.textContent = `${it.label} (μ = ${String(it.mu).replace(".", ",")})`;
+    sel.appendChild(opt);
+  });
+
+  // default
+  sel.selectedIndex = 9; // plástico sobre aço deslizante (0.25) ou ajuste como quiser
+  muInput.value = String(FRICTION_LIST[sel.selectedIndex].mu).replace(".", ",");
+
+  sel.addEventListener("change", () => {
+    muInput.value = String(toNumber(sel.value)).replace(".", ",");
+  });
+}
+
+// =============================
+// 1) CINEMÁTICA (Modo C)
 // =============================
 (function initCinematicaLona(){
   const mode = document.getElementById("cinMode");
@@ -379,136 +75,323 @@ document.addEventListener("DOMContentLoaded", function () {
 
   const btnCalc = document.getElementById("cinCalcBtn");
   const btnClear = document.getElementById("cinClearBtn");
+  const btnUseVel = document.getElementById("cinUseVelBtn");
   const out = document.getElementById("cinResult");
-    const useVelBtn = document.getElementById("cinUseVelBtn");
+
+  // produção
   const prodFourth = document.getElementById("prodFourth");
   const prodMode = document.getElementById("prodMode");
   const prodFourthLabel = document.getElementById("prodFourthLabel");
 
-  // mostrar o botão só quando existir o bloco de produção
-  if(useVelBtn && prodFourth && prodMode && prodFourthLabel){
-    useVelBtn.style.display = "inline-flex";
-
-    useVelBtn.addEventListener("click", () => {
-      // pega a última velocidade calculada no modo rpm_to_v e joga em m/min
-      // se estiver em v_to_rpm, usa a velocidade digitada (convertida)
-      const Dmm = toNumber(dmm);
-      if(!isFinite(Dmm) || Dmm <= 0) return;
-
-      const Dm = Dmm / 1000;
-
-      let v_ms = NaN;
-      if(mode.value === "v_to_rpm"){
-        let v = toNumber(vel);
-        if(!isFinite(v) || v <= 0) return;
-        if(velUnit.value === "mmin") v = v / 60;
-        v_ms = v;
-      }else{
-        const RPM = toNumber(rpm);
-        if(!isFinite(RPM) || RPM <= 0) return;
-        v_ms = (Math.PI * Dm * RPM) / 60;
-      }
-
-      const v_mmin = v_ms * 60;
-
-      // força o modo "capacidade" (porque precisa da velocidade)
-      prodMode.value = "capacity";
-      // label e placeholder ficam como velocidade
-      prodFourthLabel.textContent = "Velocidade da esteira (m/min)";
-      prodFourth.placeholder = "ex: 30";
-      prodFourth.value = v_mmin.toFixed(2).replace(".", ",");
-    });
-  }
-
-
   if(!mode || !dmm || !vel || !velUnit || !rpm || !btnCalc || !btnClear || !out) return;
 
-  function fmt(n, dec=2){
-    if(!isFinite(n)) return "—";
-    return n.toLocaleString("pt-BR", { minimumFractionDigits: dec, maximumFractionDigits: dec });
-  }
-
   function showMode(){
-    const m = mode.value;
-    const isV = (m === "v_to_rpm");
+    const isV = (mode.value === "v_to_rpm");
     velWrap.style.display = isV ? "block" : "none";
     velUnitWrap.style.display = isV ? "block" : "none";
     rpmWrap.style.display = isV ? "none" : "block";
     out.innerHTML = "";
   }
 
-  function toNumber(el){
-    const v = (el.value || "").toString().replace(",", ".");
-    const n = parseFloat(v);
-    return isFinite(n) ? n : NaN;
-  }
-
   function calc(){
-    const Dmm = toNumber(dmm);
-    if(!isFinite(Dmm) || Dmm <= 0){
+    const Dmm = toNumber(dmm.value);
+    if(!Number.isFinite(Dmm) || Dmm <= 0){
       out.innerHTML = "⚠️ Informe um diâmetro de tambor válido (mm).";
-      return;
+      return { ok:false };
     }
-    const Dm = Dmm / 1000; // mm -> m
+    const Dm = Dmm / 1000;
+
+    // perímetro
+    const perimetro = Math.PI * Dm;
 
     if(mode.value === "v_to_rpm"){
-      let v = toNumber(vel);
-      if(!isFinite(v) || v <= 0){
+      let v = toNumber(vel.value);
+      if(!Number.isFinite(v) || v <= 0){
         out.innerHTML = "⚠️ Informe uma velocidade válida.";
-        return;
+        return { ok:false };
       }
+      if(velUnit.value === "mmin") v = v / 60; // -> m/s
 
-      // unidade -> m/s
-      if(velUnit.value === "mmin") v = v / 60;
-
-      // RPM = 60*v / (pi*D)
       const RPM = (60 * v) / (Math.PI * Dm);
-
-      // também mostrar perímetro e velocidade em m/min
-      const perimetro = Math.PI * Dm;
       const v_mmin = v * 60;
 
       out.innerHTML =
         `RPM do tambor: <b>${fmt(RPM, 1)} rpm</b><br>` +
         `Velocidade: <b>${fmt(v, 3)} m/s</b> (≙ ${fmt(v_mmin, 2)} m/min)<br>` +
         `Perímetro do tambor: ${fmt(perimetro, 4)} m`;
-      return;
+
+      return { ok:true, v_ms:v, v_mmin, rpm:RPM };
     }
 
     // rpm_to_v
-    const RPM = toNumber(rpm);
-    if(!isFinite(RPM) || RPM <= 0){
+    const RPM = toNumber(rpm.value);
+    if(!Number.isFinite(RPM) || RPM <= 0){
       out.innerHTML = "⚠️ Informe um RPM válido (rpm).";
-      return;
+      return { ok:false };
     }
 
-    // v = (pi*D*RPM)/60
-    const v = (Math.PI * Dm * RPM) / 60;
+    const v = (Math.PI * Dm * RPM) / 60; // m/s
     const v_mmin = v * 60;
-    const perimetro = Math.PI * Dm;
 
     out.innerHTML =
       `Velocidade da lona: <b>${fmt(v, 3)} m/s</b> (≙ ${fmt(v_mmin, 2)} m/min)<br>` +
       `RPM do tambor: <b>${fmt(RPM, 1)} rpm</b><br>` +
       `Perímetro do tambor: ${fmt(perimetro, 4)} m`;
+
+    return { ok:true, v_ms:v, v_mmin, rpm:RPM };
   }
 
   function clear(){
     dmm.value = "";
     vel.value = "";
     rpm.value = "";
-    out.innerHTML = "";
     mode.value = "v_to_rpm";
     velUnit.value = "ms";
+    out.innerHTML = "";
     showMode();
   }
 
-  mode.addEventListener("change", showMode);
   btnCalc.addEventListener("click", (e)=>{ e.preventDefault(); calc(); });
   btnClear.addEventListener("click", (e)=>{ e.preventDefault(); clear(); });
+  mode.addEventListener("change", showMode);
+
+  // Atalho (não interfere): preencher velocidade (m/min) no bloco de produção
+  if(btnUseVel && prodFourth && prodMode && prodFourthLabel){
+    btnUseVel.addEventListener("click", (e) => {
+      e.preventDefault();
+      const r = calc();
+      if(!r.ok) return;
+
+      prodMode.value = "capacity";
+      prodFourthLabel.textContent = "Velocidade da esteira (m/min)";
+      prodFourth.value = String(r.v_mmin.toFixed(2)).replace(".", ",");
+    });
+  }
 
   showMode();
 })();
 
+// =============================
+// 2) Produção (produto + espaçamento)
+// =============================
+(function initProducao(){
+  const lenEl = document.getElementById("prodLen");
+  const gapEl = document.getElementById("prodGap");
+  const modeEl = document.getElementById("prodMode");
+  const fourthLabel = document.getElementById("prodFourthLabel");
+  const fourthEl = document.getElementById("prodFourth");
+  const btnCalc = document.getElementById("prodCalcBtn");
+  const btnClear = document.getElementById("prodClearBtn");
+  const out = document.getElementById("prodResult");
 
+  if(!lenEl || !gapEl || !modeEl || !fourthEl || !btnCalc || !btnClear || !out || !fourthLabel) return;
 
+  function updateFourthLabel(){
+    if(modeEl.value === "capacity"){
+      fourthLabel.textContent = "Velocidade da esteira (m/min)";
+      fourthEl.placeholder = "ex: 30";
+    }else{
+      fourthLabel.textContent = "Capacidade desejada (prod/min)";
+      fourthEl.placeholder = "ex: 40";
+    }
+    out.innerHTML = "";
+  }
+
+  function calc(){
+    const Lmm = toNumber(lenEl.value);
+    const Gmm = toNumber(gapEl.value);
+    if(!Number.isFinite(Lmm) || Lmm <= 0 || !Number.isFinite(Gmm) || Gmm < 0){
+      out.innerHTML = "⚠️ Informe comprimento do produto e espaçamento válidos (mm).";
+      return;
+    }
+
+    const pitch_m = (Lmm + Gmm) / 1000; // passo em metros
+    if(pitch_m <= 0){
+      out.innerHTML = "⚠️ Passo inválido (produto + espaçamento).";
+      return;
+    }
+
+    if(modeEl.value === "capacity"){
+      const v_mmin = toNumber(fourthEl.value);
+      if(!Number.isFinite(v_mmin) || v_mmin <= 0){
+        out.innerHTML = "⚠️ Informe uma velocidade válida (m/min).";
+        return;
+      }
+
+      const ppm = v_mmin / pitch_m; // prod/min
+      const v_ms = v_mmin / 60;
+      const t_between = pitch_m / v_ms; // s
+
+      out.innerHTML =
+        `Passo (produto + espaçamento): <b>${fmt(pitch_m * 1000, 1)} mm</b><br>` +
+        `Capacidade: <b>${fmt(ppm, 2)} prod/min</b><br>` +
+        `Tempo entre produtos (aprox.): <b>${fmt(t_between, 2)} s</b><br>` +
+        `Velocidade: ${fmt(v_ms, 3)} m/s (≙ ${fmt(v_mmin, 2)} m/min)`;
+      return;
+    }
+
+    // speed
+    const ppm = toNumber(fourthEl.value);
+    if(!Number.isFinite(ppm) || ppm <= 0){
+      out.innerHTML = "⚠️ Informe uma capacidade válida (prod/min).";
+      return;
+    }
+
+    const v_mmin = ppm * pitch_m;
+    const v_ms = v_mmin / 60;
+    const t_between = pitch_m / v_ms;
+
+    out.innerHTML =
+      `Passo (produto + espaçamento): <b>${fmt(pitch_m * 1000, 1)} mm</b><br>` +
+      `Velocidade necessária: <b>${fmt(v_mmin, 2)} m/min</b> (≙ ${fmt(v_ms, 3)} m/s)<br>` +
+      `Tempo entre produtos (aprox.): <b>${fmt(t_between, 2)} s</b><br>` +
+      `Capacidade alvo: ${fmt(ppm, 2)} prod/min`;
+  }
+
+  function clear(){
+    lenEl.value = "";
+    gapEl.value = "";
+    modeEl.value = "capacity";
+    fourthEl.value = "";
+    out.innerHTML = "";
+    updateFourthLabel();
+  }
+
+  modeEl.addEventListener("change", updateFourthLabel);
+  btnCalc.addEventListener("click", (e)=>{ e.preventDefault(); calc(); });
+  btnClear.addEventListener("click", (e)=>{ e.preventDefault(); clear(); });
+
+  updateFourthLabel();
+})();
+
+// =============================
+// 3) Torque no tambor (lona - modelo simples)
+// Ft = mu * m * g (horizontal)
+// T = Ft * (D/2)
+// =============================
+(function initTorque(){
+  const massEl = document.getElementById("torqueMass");
+  const dmmEl = document.getElementById("torqueDmm");
+  const muEl = document.getElementById("fricMu");
+  const btnCalc = document.getElementById("torqueCalcBtn");
+  const btnClear = document.getElementById("torqueClearBtn");
+  const out = document.getElementById("torqueResult");
+
+  if(!massEl || !dmmEl || !muEl || !btnCalc || !btnClear || !out) return;
+
+  function calc(){
+    const m = toNumber(massEl.value);
+    const Dmm = toNumber(dmmEl.value);
+    const mu = toNumber(muEl.value);
+
+    if(!Number.isFinite(m) || m <= 0 || !Number.isFinite(Dmm) || Dmm <= 0 || !Number.isFinite(mu) || mu <= 0){
+      out.innerHTML = "⚠️ Informe massa, diâmetro e μ válidos.";
+      return;
+    }
+
+    const Dm = Dmm / 1000;
+    const Ft = mu * m * G;           // N
+    const T = Ft * (Dm / 2);         // N·m
+
+    const Ft_kgf = Ft / G;
+    const T_kgfm = T / G;
+
+    out.innerHTML =
+      `Força tangencial no tambor: <b>${fmt(Ft, 2)} N</b> (≈ ${fmt(Ft_kgf, 2)} kgf)<br>` +
+      `Torque no tambor: <b>${fmt(T, 2)} N·m</b> (≈ ${fmt(T_kgfm, 3)} kgf·m)`;
+  }
+
+  function clear(){
+    massEl.value = "";
+    dmmEl.value = "";
+    out.innerHTML = "";
+  }
+
+  btnCalc.addEventListener("click", (e)=>{ e.preventDefault(); calc(); });
+  btnClear.addEventListener("click", (e)=>{ e.preventDefault(); clear(); });
+})();
+
+// =============================
+// 4) Potência (lona)
+// Horizontal: Ft = mu*m*g
+// Inclinado: Ft = m*g*(mu*cosθ + sinθ)
+// P = Ft*v / eta
+// =============================
+(function initPotencia(){
+  const massEl = document.getElementById("powMass");
+  const typeEl = document.getElementById("powType");
+  const angleEl = document.getElementById("powAngle");
+  const velEl = document.getElementById("powVel");
+  const velUnitEl = document.getElementById("powVelUnit");
+  const etaEl = document.getElementById("powEta");
+  const muEl = document.getElementById("fricMu");
+
+  const btnCalc = document.getElementById("powCalcBtn");
+  const btnClear = document.getElementById("powClearBtn");
+  const out = document.getElementById("powResult");
+
+  if(!massEl || !typeEl || !angleEl || !velEl || !velUnitEl || !etaEl || !muEl || !btnCalc || !btnClear || !out) return;
+
+  function calc(){
+    const m = toNumber(massEl.value);
+    const mu = toNumber(muEl.value);
+    let v = toNumber(velEl.value);
+    const eta = toNumber(etaEl.value);
+
+    if(!Number.isFinite(m) || m <= 0 || !Number.isFinite(mu) || mu <= 0 || !Number.isFinite(v) || v <= 0 || !Number.isFinite(eta) || eta <= 0 || eta > 1){
+      out.innerHTML = "⚠️ Informe massa, μ, velocidade e rendimento válidos.";
+      return;
+    }
+
+    // velocidade -> m/s
+    if(velUnitEl.value === "mmin") v = v / 60;
+
+    let theta = 0;
+    if(typeEl.value === "inclinado"){
+      const ang = toNumber(angleEl.value);
+      if(!Number.isFinite(ang) || ang < 0 || ang > 60){
+        out.innerHTML = "⚠️ Informe um ângulo válido (0 a 60°).";
+        return;
+      }
+      theta = degToRad(ang);
+    }
+
+    // força tangencial equivalente
+    let Ft = 0;
+    if(typeEl.value === "horizontal"){
+      Ft = mu * m * G;
+    }else{
+      Ft = m * G * (mu * Math.cos(theta) + Math.sin(theta));
+    }
+
+    const P = (Ft * v) / eta; // W
+    const PkW = P / 1000;
+
+    out.innerHTML =
+      `Força equivalente (Ft): <b>${fmt(Ft, 2)} N</b> (≈ ${fmt(Ft / G, 2)} kgf)<br>` +
+      `Potência no eixo (corrigida por η): <b>${fmt(P, 1)} W</b> (≈ ${fmt(PkW, 3)} kW)<br>` +
+      `Velocidade: ${fmt(v, 3)} m/s (≙ ${fmt(v * 60, 2)} m/min)`;
+  }
+
+  function clear(){
+    massEl.value = "";
+    velEl.value = "";
+    angleEl.value = "";
+    out.innerHTML = "";
+    typeEl.value = "horizontal";
+    velUnitEl.value = "ms";
+    etaEl.value = "0.80";
+  }
+
+  // Se for horizontal, ângulo não é necessário (mas deixamos visível pra não “bugar layout”)
+  typeEl.addEventListener("change", () => {
+    // opcional: poderia desabilitar o campo de ângulo quando horizontal
+    out.innerHTML = "";
+  });
+
+  btnCalc.addEventListener("click", (e)=>{ e.preventDefault(); calc(); });
+  btnClear.addEventListener("click", (e)=>{ e.preventDefault(); clear(); });
+})();
+
+// Init do seletor de atrito
+initFrictionSelect();
