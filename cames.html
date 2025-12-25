@@ -6,19 +6,19 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="./styles.css">
 
-  <!-- Chart.js -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 
   <style>
-    .two-col{display:grid;grid-template-columns:1.1fr .9fr;gap:14px}
+    .two-col{display:grid;grid-template-columns:1.15fr .85fr;gap:14px}
     @media(max-width:1000px){.two-col{grid-template-columns:1fr}}
-    canvas.chart{width:100%!important;height:220px!important}
-    .mini{font-size:12px;color:var(--muted);line-height:1.5;margin-top:8px}
-    .warnbox{margin-top:10px;padding:12px;border-radius:12px;border:1px solid rgba(255,160,74,.35);background:rgba(255,160,74,.06)}
-    .okbox{margin-top:10px;padding:12px;border-radius:12px;border:1px solid rgba(74,255,160,.25);background:rgba(74,255,160,.05)}
+    .help{font-size:12px;color:var(--muted);line-height:1.45;margin-top:6px}
+    .warnbox{margin-top:10px;padding:12px;border-radius:12px;border:1px solid rgba(255,160,74,.35);background:rgba(255,160,74,.06);color:rgba(255,255,255,.92)}
+    .okbox{margin-top:10px;padding:12px;border-radius:12px;border:1px solid rgba(74,255,160,.25);background:rgba(74,255,160,.05);color:rgba(255,255,255,.92)}
+    .chart-wrap{border-radius:12px;border:1px solid rgba(255,255,255,.08);background:rgba(0,0,0,.18);padding:10px;margin-bottom:10px}
+    .chart-title{font-weight:900;color:var(--title);font-size:13px;margin:0 0 8px 0}
+    canvas.chart{width:100%!important;height:260px!important}
     .profile{border-radius:12px;border:1px solid rgba(255,255,255,.08);background:rgba(0,0,0,.18);padding:10px;margin-top:10px}
     #profileCanvas{width:100%;height:auto;display:block}
-    .hint{font-size:12px;color:var(--muted);line-height:1.45;margin-top:6px}
     .pill{display:inline-block;padding:6px 10px;border-radius:999px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.04);font-size:12px;font-weight:800;color:rgba(255,255,255,.92);margin-right:8px;margin-top:6px}
   </style>
 </head>
@@ -42,14 +42,14 @@
 <section class="card">
   <h2>Cames – Ciclo completo 0–360°</h2>
   <p class="para">
-    Gráficos de <b>s(θ)</b>, <b>v(θ)</b>, <b>a(θ)</b>, <b>jerk</b> e visualização do <b>perfil 2D</b> (came radial com seguidor de rolete).
+    Came radial (disco) com seguidor translacional de <b>rolete</b>. Gera <b>gráficos</b> e o <b>perfil 2D</b>.
   </p>
 
   <div class="two-col">
-
     <!-- Inputs -->
     <div>
       <div class="grid-4">
+
         <div class="field">
           <label>Lei de movimento</label>
           <select id="camLaw">
@@ -57,47 +57,55 @@
             <option value="cycloidal">Cicloidal</option>
             <option value="poly345">Polinomial 3-4-5</option>
           </select>
-          <div class="hint" id="lawHint"></div>
+          <div class="help" id="lawHint"></div>
         </div>
 
         <div class="field">
           <label>Curso H (mm)</label>
           <input id="camH" type="number" step="0.1" placeholder="ex: 30">
+          <div class="help">Deslocamento total do seguidor (mínimo → máximo).</div>
         </div>
 
         <div class="field">
           <label>RPM do came</label>
           <input id="camRpm" type="number" step="0.1" placeholder="ex: 60">
+          <div class="help">Rotação do came. Aumentar RPM aumenta v/a/jerk.</div>
         </div>
 
         <div class="field">
           <label>Dwell inicial δ1 (°)</label>
           <input id="camD1" type="number" step="0.1" placeholder="ex: 60">
+          <div class="help">Parada inicial com seguidor em 0 mm (antes da subida).</div>
         </div>
 
         <div class="field">
           <label>Subida β (°)</label>
           <input id="camRise" type="number" step="0.1" placeholder="ex: 90">
+          <div class="help">Ângulo para o seguidor sair de 0 até H. β pequeno → mais agressivo.</div>
         </div>
 
         <div class="field">
           <label>Retorno β (°)</label>
           <input id="camReturn" type="number" step="0.1" placeholder="ex: 90">
+          <div class="help">Ângulo para o seguidor voltar de H até 0.</div>
         </div>
 
         <div class="field">
           <label>Raio base Rb (mm)</label>
           <input id="camRb" type="number" step="0.1" placeholder="ex: 35">
+          <div class="help">Raio do círculo base do came (tamanho “mínimo” do came).</div>
         </div>
 
         <div class="field">
           <label>Raio do rolete Rr (mm)</label>
           <input id="camRr" type="number" step="0.1" placeholder="ex: 8">
+          <div class="help">Raio do rolete do seguidor. Afeta o envelope do perfil.</div>
         </div>
 
         <div class="field">
           <label>Offset e (mm)</label>
           <input id="camOffset" type="number" step="0.1" value="0">
+          <div class="help">Deslocamento lateral do seguidor em relação ao centro do came (e=0 é o padrão).</div>
         </div>
 
         <div class="field">
@@ -107,6 +115,7 @@
             <option value="721">721 (0,5°)</option>
             <option value="1441">1441 (0,25°)</option>
           </select>
+          <div class="help">Mais pontos = curva mais “lisa”, mas pode deixar mais pesado.</div>
         </div>
 
         <div class="field">
@@ -116,17 +125,20 @@
             <option value="10000" selected>10.000</option>
             <option value="20000">20.000</option>
           </select>
+          <div class="help">Limite inicial para alertas de vibração/impactos.</div>
         </div>
 
         <div class="field">
           <label>Limite jerk (mm/s³)</label>
           <select id="camJmaxLim">
-            <option value="100000">100.000</option>
-            <option value="200000" selected>200.000</option>
+            <option value="100000">100.000 (suave)</option>
+            <option value="200000" selected>200.000 (típico)</option>
             <option value="300000">300.000</option>
-            <option value="400000">400.000</option>
+            <option value="400000">400.000 (agressivo)</option>
           </select>
+          <div class="help">Jerk é o “tranco”. Valores altos aumentam vibração e ruído.</div>
         </div>
+
       </div>
 
       <div class="btn-row">
@@ -137,25 +149,37 @@
       <div id="camSummary" class="okbox" style="display:none"></div>
       <div id="camWarn" class="warnbox" style="display:none"></div>
 
-      <div class="mini">
-        <span class="pill">Jerk</span>
-        <div>
-          <b>Jerk</b> é a variação da aceleração no tempo (o “tranco”). Valores altos aumentam vibração, ruído e desgaste.
-          Referências iniciais: ≤100.000 mm/s³ (suave), 100.000–300.000 (típico), >300.000 (agressivo).
-        </div>
+      <div class="help">
+        <span class="pill">Referência rápida</span><br>
+        Jerk: ≤ 100.000 mm/s³ (suave), 100.000–300.000 (típico), > 300.000 (agressivo).
       </div>
     </div>
 
-    <!-- Gráficos + Perfil -->
+    <!-- Charts + Profile -->
     <div>
-      <canvas id="chartS" class="chart"></canvas>
-      <canvas id="chartV" class="chart"></canvas>
-      <canvas id="chartA" class="chart"></canvas>
-      <canvas id="chartJ" class="chart"></canvas>
+      <div class="chart-wrap">
+        <div class="chart-title">Deslocamento s(θ) [mm]</div>
+        <canvas id="chartS" class="chart"></canvas>
+      </div>
+
+      <div class="chart-wrap">
+        <div class="chart-title">Velocidade v(θ) [mm/s]</div>
+        <canvas id="chartV" class="chart"></canvas>
+      </div>
+
+      <div class="chart-wrap">
+        <div class="chart-title">Aceleração a(θ) [mm/s²]</div>
+        <canvas id="chartA" class="chart"></canvas>
+      </div>
+
+      <div class="chart-wrap">
+        <div class="chart-title">Jerk j(θ) [mm/s³]</div>
+        <canvas id="chartJ" class="chart"></canvas>
+      </div>
 
       <div class="profile">
-        <div class="mini" style="margin:0 0 6px 0;">
-          <b>Perfil 2D:</b> pitch curve (centro do rolete) + envelope (perfil real do came)
+        <div class="help" style="margin-top:0">
+          <b>Perfil 2D:</b> branco = perfil do came (envelope), azul = trajetória do centro do rolete (pitch).
         </div>
         <canvas id="profileCanvas" width="520" height="520"></canvas>
       </div>
