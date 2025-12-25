@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Mecalc – Cames</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="./styles.css">
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+
+  <style>
+    .two-col{display:grid;grid-template-columns:1.1fr .9fr;gap:14px}
+    @media(max-width:1000px){.two-col{grid-template-columns:1fr}}
+    canvas{width:100%!important;height:240px!important}
+    .mini{font-size:12px;color:var(--muted);line-height:1.5}
+    .warnbox{margin-top:10px;padding:12px;border-radius:12px;border:1px solid rgba(255,160,74,.35);background:rgba(255,160,74,.06)}
+    .okbox{margin-top:10px;padding:12px;border-radius:12px;border:1px solid rgba(74,255,160,.25);background:rgba(74,255,160,.05)}
+    .profile{border-radius:12px;border:1px solid rgba(255,255,255,.08);background:rgba(0,0,0,.18);padding:10px}
+  </style>
+</head>
+
+<body>
+
+<header class="top">
+  <div class="wrap">
+    <h1>Mecalc</h1>
+    <nav class="main-nav">
+      <a href="./home.html">Home</a>
+      <a href="./index.html">Pneumática</a>
+      <a href="./transportadores.html">Transportadores</a>
+      <a href="./normas.html">Normas</a>
+      <a href="./cames.html" class="active">Cames</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+
+<section class="card">
+<h2>Cames – Ciclo completo 0–360°</h2>
+<p class="para">
+Análise cinemática e visualização geométrica do perfil do came radial com seguidor de rolete.
+</p>
+
+<div class="two-col">
+
+<!-- INPUTS -->
+<div>
+<div class="grid-4">
+  <div class="field">
+    <label>Lei de movimento</label>
+    <select id="law">
+      <option value="harmonic">Harmônica</option>
+      <option value="cycloidal">Cicloidal</option>
+      <option value="poly345">Polinomial 3-4-5</option>
+    </select>
+  </div>
+
+  <div class="field">
+    <label>Curso do seguidor H (mm)</label>
+    <input id="H" type="number" step="0.1">
+  </div>
+
+  <div class="field">
+    <label>RPM do came</label>
+    <input id="rpm" type="number" step="0.1">
+  </div>
+
+  <div class="field">
+    <label>Dwell inicial (°)</label>
+    <input id="d1" type="number" step="0.1">
+  </div>
+
+  <div class="field">
+    <label>Subida (°)</label>
+    <input id="rise" type="number" step="0.1">
+  </div>
+
+  <div class="field">
+    <label>Retorno (°)</label>
+    <input id="ret" type="number" step="0.1">
+  </div>
+
+  <div class="field">
+    <label>Raio base Rb (mm)</label>
+    <input id="Rb" type="number" step="0.1">
+  </div>
+
+  <div class="field">
+    <label>Raio do rolete Rr (mm)</label>
+    <input id="Rr" type="number" step="0.1">
+  </div>
+
+  <div class="field">
+    <label>Offset e (mm)</label>
+    <input id="e" type="number" step="0.1" value="0">
+  </div>
+</div>
+
+<div class="btn-row">
+  <button class="btn primary" id="calc">Gerar</button>
+</div>
+
+<div id="summary" class="okbox" style="display:none"></div>
+<div id="warn" class="warnbox" style="display:none"></div>
+
+<div class="mini">
+<b>Jerk:</b> mede o tranco do movimento. Valores elevados indicam maior risco de vibração e desgaste.
+</div>
+</div>
+
+<!-- GRÁFICOS -->
+<div>
+<canvas id="sChart"></canvas>
+<canvas id="vChart"></canvas>
+<canvas id="aChart"></canvas>
+<canvas id="jChart"></canvas>
+
+<div class="profile">
+<canvas id="profileCanvas" width="300" height="300"></canvas>
+</div>
+</div>
+
+</div>
+</section>
+
+</main>
+
+<script src="./cames.js"></script>
+</body>
+</html>
