@@ -362,3 +362,112 @@ document.addEventListener("DOMContentLoaded", function () {
   if (limparVelocidadeBtn)limparVelocidadeBtn.addEventListener("click", limparVelocidadeProdutos);
 
 });
+// =============================
+// Cinemática (lona): modo C
+// RPM do tambor <-> velocidade
+// =============================
+(function initCinematicaLona(){
+  const mode = document.getElementById("cinMode");
+  const dmm = document.getElementById("cinDmm");
+  const vel = document.getElementById("cinVel");
+  const velUnit = document.getElementById("cinVelUnit");
+  const rpm = document.getElementById("cinRpm");
+
+  const velWrap = document.getElementById("cinVelWrap");
+  const velUnitWrap = document.getElementById("cinVelUnitWrap");
+  const rpmWrap = document.getElementById("cinRpmWrap");
+
+  const btnCalc = document.getElementById("cinCalcBtn");
+  const btnClear = document.getElementById("cinClearBtn");
+  const out = document.getElementById("cinResult");
+
+  if(!mode || !dmm || !vel || !velUnit || !rpm || !btnCalc || !btnClear || !out) return;
+
+  function fmt(n, dec=2){
+    if(!isFinite(n)) return "—";
+    return n.toLocaleString("pt-BR", { minimumFractionDigits: dec, maximumFractionDigits: dec });
+  }
+
+  function showMode(){
+    const m = mode.value;
+    const isV = (m === "v_to_rpm");
+    velWrap.style.display = isV ? "block" : "none";
+    velUnitWrap.style.display = isV ? "block" : "none";
+    rpmWrap.style.display = isV ? "none" : "block";
+    out.innerHTML = "";
+  }
+
+  function toNumber(el){
+    const v = (el.value || "").toString().replace(",", ".");
+    const n = parseFloat(v);
+    return isFinite(n) ? n : NaN;
+  }
+
+  function calc(){
+    const Dmm = toNumber(dmm);
+    if(!isFinite(Dmm) || Dmm <= 0){
+      out.innerHTML = "⚠️ Informe um diâmetro de tambor válido (mm).";
+      return;
+    }
+    const Dm = Dmm / 1000; // mm -> m
+
+    if(mode.value === "v_to_rpm"){
+      let v = toNumber(vel);
+      if(!isFinite(v) || v <= 0){
+        out.innerHTML = "⚠️ Informe uma velocidade válida.";
+        return;
+      }
+
+      // unidade -> m/s
+      if(velUnit.value === "mmin") v = v / 60;
+
+      // RPM = 60*v / (pi*D)
+      const RPM = (60 * v) / (Math.PI * Dm);
+
+      // também mostrar perímetro e velocidade em m/min
+      const perimetro = Math.PI * Dm;
+      const v_mmin = v * 60;
+
+      out.innerHTML =
+        `RPM do tambor: <b>${fmt(RPM, 1)} rpm</b><br>` +
+        `Velocidade: <b>${fmt(v, 3)} m/s</b> (≙ ${fmt(v_mmin, 2)} m/min)<br>` +
+        `Perímetro do tambor: ${fmt(perimetro, 4)} m`;
+      return;
+    }
+
+    // rpm_to_v
+    const RPM = toNumber(rpm);
+    if(!isFinite(RPM) || RPM <= 0){
+      out.innerHTML = "⚠️ Informe um RPM válido (rpm).";
+      return;
+    }
+
+    // v = (pi*D*RPM)/60
+    const v = (Math.PI * Dm * RPM) / 60;
+    const v_mmin = v * 60;
+    const perimetro = Math.PI * Dm;
+
+    out.innerHTML =
+      `Velocidade da lona: <b>${fmt(v, 3)} m/s</b> (≙ ${fmt(v_mmin, 2)} m/min)<br>` +
+      `RPM do tambor: <b>${fmt(RPM, 1)} rpm</b><br>` +
+      `Perímetro do tambor: ${fmt(perimetro, 4)} m`;
+  }
+
+  function clear(){
+    dmm.value = "";
+    vel.value = "";
+    rpm.value = "";
+    out.innerHTML = "";
+    mode.value = "v_to_rpm";
+    velUnit.value = "ms";
+    showMode();
+  }
+
+  mode.addEventListener("change", showMode);
+  btnCalc.addEventListener("click", (e)=>{ e.preventDefault(); calc(); });
+  btnClear.addEventListener("click", (e)=>{ e.preventDefault(); clear(); });
+
+  showMode();
+})();
+
+
