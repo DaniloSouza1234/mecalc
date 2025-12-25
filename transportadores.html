@@ -21,6 +21,52 @@
 </header>
 
 <main class="wrap">
+<section class="card">
+  <h2>Cinemática do transportador (lona)</h2>
+  <p class="para">
+    Calcule o <b>RPM do tambor</b> a partir da velocidade, ou a <b>velocidade da lona</b> a partir do RPM.
+  </p>
+
+  <div class="grid-4">
+    <div class="field">
+      <label>Modo de cálculo</label>
+      <select id="cinMode">
+        <option value="v_to_rpm">Velocidade → RPM</option>
+        <option value="rpm_to_v">RPM → Velocidade</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label>Diâmetro do tambor (mm)</label>
+      <input id="cinDmm" type="number" step="0.1" placeholder="ex: 100">
+    </div>
+
+    <div class="field" id="cinVelWrap">
+      <label>Velocidade da lona</label>
+      <input id="cinVel" type="number" step="0.001" placeholder="ex: 0,5">
+    </div>
+
+    <div class="field" id="cinVelUnitWrap">
+      <label>Unidade da velocidade</label>
+      <select id="cinVelUnit">
+        <option value="ms">m/s</option>
+        <option value="mmin">m/min</option>
+      </select>
+    </div>
+
+    <div class="field" id="cinRpmWrap" style="display:none;">
+      <label>RPM do tambor</label>
+      <input id="cinRpm" type="number" step="0.1" placeholder="ex: 95,5">
+    </div>
+  </div>
+
+  <div class="btn-row">
+    <button class="btn primary" id="cinCalcBtn">Calcular</button>
+    <button class="btn" id="cinClearBtn" type="button">Limpar</button>
+  </div>
+
+  <div class="result-box" id="cinResult"></div>
+</section>
 
   <!-- CARD 1 – TORQUE NO TAMBOR -->
   <section class="card">
@@ -186,4 +232,5 @@
 <script src="transportadores.js"></script>
 </body>
 </html>
+
 
