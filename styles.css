@@ -1,233 +1,76 @@
-:root {
-  --bg: #050507;
-  --card: #111119;
-  --border: #30303a;
-  --text: #dddddd;
-  --muted: #aaaaaa;
-  --title: #ffffff;
-  --button-bg: #e63946;
-  --button-hover: #ff5c6a;
-  --input-bg: #050509;
-}
-
-* {
-  box-sizing: border-box;
-}
-
-body {
-  margin: 0;
-  font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-  background: radial-gradient(1200px 600px at 10% 10%, rgba(230,57,70,.20), transparent 60%),
-              radial-gradient(900px 500px at 90% 10%, rgba(230,57,70,.16), transparent 55%),
-              var(--bg);
-  color: var(--text);
-}
-
-.wrap {
-  width: min(1100px, 92vw);
-  margin: 0 auto;
-}
-
-/* HEADER */
-.top {
-  padding: 16px 0;
-}
-
-.top h1 {
-  margin: 0;
-  color: var(--title);
-  font-size: 22px;
-  font-weight: 800;
-}
-
-/* NAV */
-.main-nav {
-  margin-top: 8px;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-
-.main-nav a {
-  font-size: 13px;
-  text-decoration: none;
-  padding: 6px 12px;
-  border-radius: 20px;
-  border: 1px solid var(--border);
-  color: var(--text);
-  background: rgba(0,0,0,.18);
-}
-
-.main-nav a.active {
-  border-color: rgba(226,59,59,.55);
-  background: linear-gradient(180deg, rgba(226,59,59,.95), rgba(190,34,34,.95));
-  color: white;
-  font-weight: 800;
-}
-
-/* CARD */
-.card {
-  background: rgba(17,17,25,.82);
+/* ===== Pneumática: diagrama θ (alavanca x cilindro) ===== */
+.lever-diagram{
+  margin-top: 12px;
+  padding: 10px 12px;
   border-radius: 14px;
-  border: 1px solid var(--border);
-  padding: 14px 16px;
-  margin-top: 14px;
-  box-shadow: 0 0 14px rgba(0, 0, 0, 0.6);
+  border: 1px solid rgba(255,255,255,.10);
+  background: rgba(0,0,0,.16);
 }
-
-.card h2 {
-  margin: 0 0 6px 0;
+.lever-diagram-title{
+  font-weight: 900;
   color: var(--title);
-  font-size: 16px;
-  font-weight: 800;
+  margin-bottom: 8px;
+  font-size: 13px;
 }
-
-.para {
-  margin: 6px 0;
-  color: rgba(255,255,255,.88);
-  line-height: 1.55;
-}
-
-/* GRID DE CAMPOS */
-.torque-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
-  gap: 10px 14px;
-  margin-top: 8px;
-}
-
-.card label {
+.lever-diagram svg{
+  width: 100%;
+  height: auto;
   display: block;
+}
+.lever-diagram-note{
+  margin-top: 8px;
   font-size: 12px;
   color: var(--muted);
-  font-weight: 800;
+  line-height: 1.45;
 }
 
-.card input, .card select {
-  width: 100%;
-  height: 40px;
-  border-radius: 10px;
-  border: 1px solid var(--border);
-  background: rgba(0,0,0,.22);
-  color: var(--title);
-  padding: 0 12px;
-  font-weight: 800;
-  outline: none;
+.muted-small{
+  font-size: 11px;
+  color: var(--muted);
+  font-weight: 700;
+}
+
+.mini-help{
   margin-top: 6px;
+  font-size: 12px;
+  color: var(--muted);
+  line-height: 1.45;
 }
 
-.card button {
-  height: 40px;
-  border-radius: 10px;
-  border: 1px solid rgba(255,255,255,.10);
-  background: linear-gradient(180deg, rgba(226,59,59,.95), rgba(190,34,34,.95));
-  color: white;
-  font-weight: 900;
-  cursor: pointer;
-  padding: 0 14px;
-}
-
-.card button:hover {
-  filter: brightness(1.05);
-}
-
-/* RESULT */
-.result {
-  margin-top: 10px;
-  padding: 10px 12px;
-  border-radius: 12px;
-  border: 1px solid rgba(255,255,255,.10);
-  background: rgba(0,0,0,.18);
-  line-height: 1.6;
-}
-
-.result-warning {
-  border-color: rgba(255,213,74,.35);
-  background: rgba(255,213,74,.06);
-}
-
-/* CONTROLS */
-.controls {
-  display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
-  margin-top: 10px;
-  align-items: flex-end;
-}
-
-.controls label {
-  min-width: 200px;
-}
-
-/* TABELA PNEUMÁTICA */
-#forceTable {
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 10px;
-  font-size: 13px;
-}
-
-#forceTable th,
-#forceTable td {
-  border: 1px solid var(--border);
-  padding: 4px 6px;
-  text-align: center;
-}
-
-#forceTable th {
-  background: #181820;
-  font-weight: 600;
-}
-
-#forceTable tr:nth-child(even) td {
-  background: rgba(255,255,255,.02);
-}
-
-.row-selected td:first-child {
-  outline: 2px solid rgba(226,59,59,.55);
-}
-
-.cell-selected {
-  outline: 2px solid rgba(226,59,59,.55);
-  background: rgba(226,59,59,.10);
-}
-
-/* HOME: título + typing */
-.site-title {
-  font-size: 26px;
-  font-weight: 800;
-  color: var(--title);
-  display: inline-block;
-}
-
-/* (… resto do seu CSS permanece …) */
-
-
-/* TABELA – CONSUMO PNEUMÁTICO */
+/* ===== Tabela: Consumo pneumático ===== */
 #airTable{
   width:100%;
   border-collapse:collapse;
-  margin-top: 0;
   font-size:13px;
 }
-#airTable th,#airTable td{
-  border:1px solid var(--border);
-  padding:6px 6px;
+#airTable th, #airTable td{
+  border: 1px solid var(--border);
+  padding: 6px 6px;
   text-align:center;
   white-space:nowrap;
 }
 #airTable th{
-  background:#181820;
-  font-weight:600;
+  background: #181820;
 }
-#airTable input{
+.air-inp{
   width: 92px;
-  height: 30px;
-  border-radius: 8px;
+  height: 32px;
+  border-radius: 10px;
   border: 1px solid var(--border);
   background: rgba(0,0,0,.22);
   color: var(--title);
-  padding: 0 8px;
+  padding: 0 10px;
   font-weight: 800;
   outline: none;
 }
+.air-del{
+  height: 32px;
+  padding: 0 10px;
+  border-radius: 10px;
+  border: 1px solid rgba(255,255,255,.10);
+  background: rgba(0,0,0,.18);
+  color: var(--title);
+  font-weight: 900;
+  cursor: pointer;
+}
+.air-del:hover{ filter: brightness(1.05); }
