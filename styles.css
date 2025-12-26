@@ -10,7 +10,9 @@
   --input-bg: #050509;
 }
 
-* { box-sizing: border-box; }
+* {
+  box-sizing: border-box;
+}
 
 body {
   margin: 0;
@@ -21,9 +23,15 @@ body {
   color: var(--text);
 }
 
-.wrap { width: min(1100px, 92vw); margin: 0 auto; }
+.wrap {
+  width: min(1100px, 92vw);
+  margin: 0 auto;
+}
 
-.top { padding: 16px 0; }
+/* HEADER */
+.top {
+  padding: 16px 0;
+}
 
 .top h1 {
   margin: 0;
@@ -45,24 +53,29 @@ body {
   padding: 6px 12px;
   border-radius: 20px;
   border: 1px solid var(--border);
-  color: var(--text);
-  background: rgba(0,0,0,.18);
+  background: #111;
+  color: var(--muted);
+}
+
+.main-nav a:hover {
+  background: #171717;
+  color: #fff;
 }
 
 .main-nav a.active {
-  border-color: rgba(226,59,59,.55);
-  background: linear-gradient(180deg, rgba(226,59,59,.95), rgba(190,34,34,.95));
-  color: white;
-  font-weight: 800;
+  background: var(--button-bg);
+  border-color: var(--button-hover);
+  color: #fff;
 }
 
+/* CARDS */
 .card {
   background: rgba(17,17,25,.82);
   border-radius: 14px;
   border: 1px solid var(--border);
   padding: 14px 16px;
   margin-top: 14px;
-  box-shadow: 0 0 14px rgba(0, 0, 0, 0.6);
+  box-shadow: 0 0 14px rgba(0,0,0,.6);
 }
 
 .card h2 {
@@ -78,80 +91,87 @@ body {
   line-height: 1.55;
 }
 
-.grid {
+.controls {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
   gap: 10px 14px;
-  margin-top: 8px;
+  margin-top: 12px;
   align-items: end;
 }
 
-.field span {
-  display: block;
+.card label {
   font-size: 12px;
   color: var(--muted);
-  font-weight: 800;
+  font-weight: 700;
+  display: block;
 }
 
-.field input, .field select {
-  width: 100%;
-  height: 40px;
-  border-radius: 10px;
+.card input,
+.card select {
+  background: var(--input-bg);
+  border-radius: 8px;
   border: 1px solid var(--border);
-  background: rgba(0,0,0,.22);
-  color: var(--title);
-  padding: 0 12px;
-  font-weight: 800;
-  outline: none;
+  padding: 6px 8px;
+  color: var(--text);
+  font-size: 13px;
   margin-top: 6px;
-}
-
-.btn {
-  height: 40px;
-  border-radius: 10px;
-  border: 1px solid rgba(255,255,255,.10);
-  background: linear-gradient(180deg, rgba(226,59,59,.95), rgba(190,34,34,.95));
-  color: white;
-  font-weight: 900;
-  cursor: pointer;
-  padding: 0 14px;
-}
-
-.btn:hover { filter: brightness(1.05); }
-
-.table-wrap { overflow-x: auto; }
-
-#forceTable {
   width: 100%;
+}
+
+.card button {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 10px 12px;
+  background: var(--button-bg);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  transition: 0.15s;
+}
+
+.card button:hover {
+  background: var(--button-hover);
+}
+
+/* TABELA */
+table {
   border-collapse: collapse;
-  margin-top: 10px;
+  width: 100%;
   font-size: 13px;
 }
 
-#forceTable th, #forceTable td {
+th, td {
   border: 1px solid var(--border);
-  padding: 4px 6px;
+  padding: 6px 8px;
   text-align: center;
 }
 
-#forceTable th {
-  background: #181820;
-  font-weight: 600;
+th {
+  background: rgba(0,0,0,.25);
+  color: #fff;
 }
 
-#forceTable tr:nth-child(even) td {
+tbody tr:nth-child(even) td {
   background: rgba(255,255,255,.02);
 }
 
-.row-selected td:first-child {
+/* Destaques */
+.highlight-row td {
   outline: 2px solid rgba(226,59,59,.55);
 }
 
-.cell-selected {
+.highlight-pressure {
+  outline: 2px solid rgba(226,59,59,.55);
+}
+
+.highlight-cell {
   outline: 2px solid rgba(226,59,59,.55);
   background: rgba(226,59,59,.10);
 }
 
+/* RESULTADOS */
 .result {
   margin-top: 10px;
   padding: 10px 12px;
@@ -161,56 +181,57 @@ body {
   line-height: 1.6;
 }
 
-.result-warning {
+.result.warn {
   border-color: rgba(255,213,74,.35);
   background: rgba(255,213,74,.06);
 }
 
-/* ===== Diagrama θ ===== */
-.lever-diagram{
+/* Torque layout */
+.torque-card .torque-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 10px 14px;
+  margin-top: 12px;
+  align-items: end;
+}
+
+/* ===== Diagrama de referência do ângulo (cilindro x alavanca) ===== */
+.angle-diagram{
   margin-top: 12px;
   padding: 10px 12px;
   border-radius: 14px;
   border: 1px solid rgba(255,255,255,.10);
   background: rgba(0,0,0,.16);
 }
-.lever-diagram-title{
+.angle-diagram-title{
   font-weight: 900;
   color: var(--title);
   margin-bottom: 8px;
   font-size: 13px;
 }
-.lever-diagram svg{
+.angle-diagram svg{
   width: 100%;
   height: auto;
   display: block;
 }
-.lever-diagram-note{
+.angle-diagram-note{
   margin-top: 8px;
   font-size: 12px;
   color: var(--muted);
   line-height: 1.45;
 }
 
-/* ===== Consumo pneumático (NL/min) ===== */
-.mini-help{
-  display:block;
-  margin-top:6px;
-  font-size:12px;
-  color: var(--muted);
-  line-height: 1.45;
-}
-
+/* ===== Consumo pneumático ===== */
 #airTable{
   width:100%;
   border-collapse:collapse;
-  font-size:13px;
+  font-size: 13px;
 }
 #airTable th, #airTable td{
   border: 1px solid var(--border);
   padding: 6px 6px;
   text-align:center;
-  white-space:nowrap;
+  white-space: nowrap;
 }
 #airTable th{
   background: rgba(0,0,0,.20);
@@ -218,25 +239,6 @@ body {
 #airTable tr:nth-child(even) td{
   background: rgba(255,255,255,.02);
 }
-.air-inp{
+#airTable input{
   width: 92px;
-  height: 34px;
-  border-radius: 10px;
-  border: 1px solid var(--border);
-  background: rgba(0,0,0,.22);
-  color: var(--title);
-  padding: 0 10px;
-  font-weight: 800;
-  outline: none;
 }
-.air-del{
-  height: 34px;
-  padding: 0 10px;
-  border-radius: 10px;
-  border: 1px solid rgba(255,255,255,.10);
-  background: rgba(0,0,0,.18);
-  color: var(--title);
-  font-weight: 900;
-  cursor: pointer;
-}
-.air-del:hover{ filter: brightness(1.05); }
