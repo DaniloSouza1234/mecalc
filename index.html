@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <title>Mecalc – Cálculo de Força de Cilindros Pneumáticos</title>
+  <meta charset="UTF-8" />
+  <title>Mecalc – Pneumática</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <link rel="stylesheet" href="styles.css" />
 </head>
@@ -12,7 +12,6 @@
 <header class="top">
   <div class="wrap">
     <h1>Mecalc</h1>
-
     <nav class="main-nav">
       <a href="home.html">Home</a>
       <a href="index.html" class="active">Pneumática</a>
@@ -24,97 +23,94 @@
 
 <main class="wrap">
 
-  <!-- ===================== TABELA DE FORÇA ===================== -->
+  <!-- ===================== TABELA DE FORÇAS ===================== -->
   <section class="card">
-    <h2>Tabela de força de cilindros</h2>
-    <p class="para" style="margin-top:4px;">
-      Valores em <b>kgf</b> para avanço e retorno, de <b>2 até 10 bar</b>.
+    <h2>Tabela de força de cilindros (kgf)</h2>
+    <p class="para">
+      Selecione o diâmetro (Ø) e a pressão para destacar a célula na tabela. Valores em <b>kgf</b>.
     </p>
 
-    <div class="torque-grid" style="margin-top:10px; align-items:flex-end;">
-      <label>
-        Ø do cilindro (mm)
+    <div class="grid" style="margin-top:10px;">
+      <label class="field">
+        <span>Ø do cilindro (mm)</span>
         <select id="boreSelect"></select>
       </label>
 
-      <label>
-        Pressão (bar)
-        <select id="pressure">
-          <option value="">—</option>
-          <option value="2">2 bar</option>
-          <option value="3">3 bar (interpolar 2–4)</option>
-          <option value="4">4 bar</option>
-          <option value="5">5 bar (interpolar 4–6)</option>
-          <option value="6">6 bar</option>
-          <option value="7">7 bar (interpolar 6–8)</option>
-          <option value="8">8 bar</option>
-          <option value="9">9 bar (interpolar 8–10)</option>
-          <option value="10">10 bar</option>
-        </select>
+      <label class="field">
+        <span>Pressão (bar)</span>
+        <select id="pressure"></select>
       </label>
 
-      <label>
-        Buscar Ø (linha)
-        <input type="number" id="search" placeholder="ex: 32" step="1" />
+      <label class="field">
+        <span>Buscar Ø</span>
+        <input type="number" id="search" placeholder="ex.: 32" />
       </label>
 
-      <button type="button" id="clear">Limpar</button>
+      <button id="clear" class="btn" type="button">Limpar</button>
     </div>
 
-    <div style="overflow-x:auto; margin-top:12px;">
+    <div class="table-wrap" style="margin-top:12px;">
       <table id="forceTable"></table>
     </div>
+
+    <p class="para" style="font-size:12px; color:var(--muted); margin-top:10px;">
+      Interpolação linear aproximada:
+      3 bar → entre 2 e 4 | 5 bar → entre 4 e 6 | 7 bar → entre 6 e 8 | 9 bar → entre 8 e 10.
+    </p>
   </section>
 
   <!-- ===================== TORQUE NA ALAVANCA ===================== -->
-  <section class="card torque-card">
-    <h2>Cálculo de torque na alavanca</h2>
+  <section class="card">
+    <h2>Torque na alavanca</h2>
+    <p class="para">
+      O torque é calculado por <b>T = F · L · sen(θ)</b>, onde <b>θ</b> é o ângulo entre o cilindro e a alavanca.
+    </p>
 
-    <div class="torque-grid">
-
-      <label>
-        Tipo de força (tabela)
+    <div class="grid" style="margin-top:10px;">
+      <label class="field">
+        <span>Tipo de força da tabela</span>
         <select id="forceKind">
           <option value="e">Avanço</option>
           <option value="r">Retorno</option>
         </select>
       </label>
 
-      <button type="button" id="useTableForce">
-        Usar força da tabela
-      </button>
+      <button id="useTableForce" class="btn" type="button">Usar força da tabela</button>
 
-      <label>
-        Força do cilindro (kgf)
-        <input type="number" id="forceKgf" placeholder="ex: 55" step="0.01" />
+      <label class="field">
+        <span>Força (kgf)</span>
+        <input type="number" id="cylinderForce" placeholder="ex.: 55" step="0.01" />
       </label>
 
-      <label>
-        Braço da alavanca (mm)
-        <input type="number" id="leverArm" placeholder="ex: 46.5" step="0.1" />
+      <label class="field">
+        <span>Braço da alavanca (mm)</span>
+        <input type="number" id="leverLength" placeholder="ex.: 46.5" step="0.1" />
       </label>
 
-      <label>
-        Ângulo inicial entre cilindro e alavanca (°)
-        <input type="number" id="angleStart" placeholder="ex: 45" step="0.1" />
+      <label class="field">
+        <span>Ângulo inicial θ (°)</span>
+        <input type="number" id="angleStart" placeholder="ex.: 45" step="0.1" />
       </label>
 
-      <label>
-        Ângulo final entre cilindro e alavanca (°)
-        <input type="number" id="angleEnd" placeholder="ex: 90" step="0.1" />
+      <label class="field">
+        <span>Ângulo final θ (°)</span>
+        <input type="number" id="angleEnd" placeholder="ex.: 90" step="0.1" />
       </label>
-
-      <button type="button" id="calculateTorque">
-        Calcular torque e gráfico
-      </button>
-
     </div>
 
-    <!-- ✅ DIAGRAMA TÉCNICO (de volta) -->
+    <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:10px;">
+      <button id="calculateTorque" class="btn" type="button">Calcular torque e gráfico</button>
+    </div>
+
+    <div id="torqueResult" class="result" style="margin-top:12px;"></div>
+
+    <div style="margin-top:14px;">
+      <canvas id="forceChart" height="120"></canvas>
+    </div>
+
     <div class="lever-diagram">
-      <div class="lever-diagram-title">Como medir o ângulo θ (no seu projeto)</div>
+      <div class="lever-diagram-title">Como medir o ângulo θ no CAD</div>
       <svg viewBox="0 0 520 260" role="img" aria-label="Diagrama 2D alavanca e cilindro com ângulo">
-        <!-- moldura -->
         <rect x="10" y="10" width="500" height="240" rx="16" ry="16"
               fill="rgba(0,0,0,.18)" stroke="rgba(255,255,255,.10)"/>
 
@@ -139,26 +135,20 @@
               fill="none" stroke="rgba(255,213,74,.95)" stroke-width="6" stroke-linecap="round"/>
         <text x="162" y="188" fill="rgba(255,213,74,.95)" font-size="12" font-weight="900">θ</text>
 
-        <!-- linhas guia -->
+        <!-- guias -->
         <line x1="120" y1="150" x2="168" y2="150"
               stroke="rgba(255,255,255,.20)" stroke-width="2" stroke-dasharray="6 6"/>
         <line x1="120" y1="150" x2="142" y2="186"
               stroke="rgba(255,255,255,.20)" stroke-width="2" stroke-dasharray="6 6"/>
 
         <text x="24" y="40" fill="rgba(255,255,255,.85)" font-size="12" font-weight="800">
-          θ é o ângulo entre a linha de ação do cilindro (azul) e a alavanca (vermelha), no pivô.
+          θ é o ângulo entre a linha do cilindro (azul) e a alavanca (vermelha), medido no pivô.
         </text>
       </svg>
 
       <div class="lever-diagram-note">
-        Dica: no CAD, crie duas linhas (eixo do cilindro e eixo da alavanca) e aplique a cota angular no ponto de giro.
+        Dica: no CAD, crie duas linhas (eixo do cilindro e eixo da alavanca) e aplique a cota angular no pivô.
       </div>
-    </div>
-
-    <div id="torqueResult" class="result"></div>
-
-    <div style="margin-top:16px; height:280px;">
-      <canvas id="torqueChart"></canvas>
     </div>
   </section>
 
@@ -166,41 +156,24 @@
   <section class="card">
     <h2>Dimensionar cilindro pelo torque desejado</h2>
 
-    <p class="para" style="margin-bottom:6px;">
-      Informe o torque mínimo necessário no pior ponto do intervalo de ângulo.
-    </p>
-
-    <div class="torque-grid">
-      <label>
-        Torque desejado
-        <input type="number" id="desiredTorque" placeholder="ex: 15" step="0.01" />
+    <div class="grid" style="margin-top:10px;">
+      <label class="field">
+        <span>Torque desejado</span>
+        <input type="number" id="desiredTorque" placeholder="ex.: 10" step="0.01" />
       </label>
 
-      <label>
-        Unidade do torque desejado
+      <label class="field">
+        <span>Unidade</span>
         <select id="desiredTorqueUnit">
           <option value="kgfm">kgf·m</option>
           <option value="Nm">N·m</option>
         </select>
       </label>
 
-      <label>
-        Pressão (bar)
-        <input type="number" id="desiredPressure" placeholder="ex: 6" value="6" step="0.1" />
-      </label>
-
-      <button type="button" id="calcCylinder">
-        Dimensionar cilindro
-      </button>
+      <button id="calcCylinder" class="btn" type="button">Dimensionar cilindro</button>
     </div>
 
-    <div id="cylinderResult" class="result"></div>
-
-    <div class="para" style="font-size:12px; color:var(--muted); margin-top:10px;">
-      Dica: para aplicações com impacto, alta ciclagem ou cargas variáveis, considere utilizar
-      fator de segurança maior, cilindro com diâmetro superior e/ou válvulas de retenção
-      pilotadas para evitar recuo da carga.
-    </div>
+    <div id="cylinderResult" class="result" style="margin-top:12px;"></div>
   </section>
 
   <!-- ===================== CONSUMO PNEUMÁTICO ===================== -->
@@ -212,48 +185,48 @@
       A haste é opcional: se não informar, o retorno será calculado sem descontar a área da haste (resultado conservador).
     </p>
 
-    <div class="torque-grid">
-      <label>
-        Pressão padrão (bar)
-        <input type="number" id="airPressureDefault" value="6" step="0.1" />
-        <div class="mini-help">Pressão manométrica (ex.: 6 bar). O cálculo usa Pabs = Pg + 1.</div>
+    <div class="grid">
+      <label class="field">
+        <span>Pressão padrão (bar)</span>
+        <input type="number" id="airPressureDefault" value="6" step="0.1">
+        <small class="mini-help">Pressão manométrica (ex.: 6 bar). O cálculo usa Pabs = Pg + 1.</small>
       </label>
 
-      <label>
-        Fator de perdas
-        <input type="number" id="airLossFactor" value="1.15" step="0.01" min="1" />
-        <div class="mini-help">Inclui perdas típicas por <b>válvulas</b>, <b>mangueiras</b> e <b>vazamentos</b>.</div>
+      <label class="field">
+        <span>Fator de perdas</span>
+        <input type="number" id="airLossFactor" value="1.15" step="0.01" min="1">
+        <small class="mini-help">Inclui perdas típicas por <b>válvulas</b>, <b>mangueiras</b> e <b>vazamentos</b>.</small>
       </label>
 
-      <label>
-        Margem para compressor
-        <input type="number" id="airCompressorMargin" value="1.20" step="0.01" min="1" />
-        <div class="mini-help">Margem extra para dimensionamento do compressor (ex.: +20%).</div>
+      <label class="field">
+        <span>Margem para compressor</span>
+        <input type="number" id="airCompressorMargin" value="1.20" step="0.01" min="1">
+        <small class="mini-help">Margem extra para dimensionamento do compressor (ex.: +20%).</small>
       </label>
     </div>
 
     <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:10px;">
-      <button type="button" id="airAddRow">+ Adicionar cilindro</button>
-      <button type="button" id="airCalc">Calcular consumo</button>
-      <button type="button" id="airClearRows">Limpar lista</button>
+      <button type="button" id="airAddRow" class="btn">+ Adicionar cilindro</button>
+      <button type="button" id="airCalc" class="btn">Calcular consumo</button>
+      <button type="button" id="airClearRows" class="btn">Limpar lista</button>
     </div>
 
-    <div style="overflow-x:auto; margin-top:12px;">
+    <div class="table-wrap" style="margin-top:12px;">
       <table id="airTable"></table>
     </div>
 
     <div id="airResult" class="result" style="margin-top:12px;"></div>
 
-    <div class="para" style="font-size:12px; color:var(--muted); margin-top:10px; line-height:1.5;">
+    <p class="para" style="font-size:12px; color:var(--muted); margin-top:10px; line-height:1.5;">
       Base (aprox.): <b>NL/ciclo</b> ≈ (V<sub>avanço</sub> + V<sub>retorno</sub>) · (P<sub>g</sub> + 1).<br>
       Depois: <b>NL/min</b> = NL/ciclo · ciclos/min · fator de perdas.
-    </div>
+    </p>
   </section>
 
 </main>
 
 <footer class="wrap" style="margin:30px 0; text-align:center; font-size:12px;">
-  © 2025 Mecalc — Ferramentas para Engenharia Mecânica
+  © 2025 Mecalc
 </footer>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
