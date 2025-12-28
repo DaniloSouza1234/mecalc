@@ -95,6 +95,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // ====== TABELA ======
   function buildForceTable(){
+   highlightSelection();
     let thead = "<thead><tr><th>Ø (mm)</th><th>Rosca</th>";
     pressuresDisplay.forEach(p => {
       thead += `<th data-pressure="${p}">${p} bar<br><span style="font-size:11px;">Av / Ret (kgf)</span></th>`;
@@ -357,4 +358,9 @@ function highlightSelection(){
   calcCylinderBtn.addEventListener("click", calcCylinderFromTorque);
 
 });
+
+boreSelect?.addEventListener("change", highlightSelection);
+pressureSelect?.addEventListener("change", highlightSelection);
+
+
 
