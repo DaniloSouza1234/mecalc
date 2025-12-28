@@ -95,6 +95,19 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // ====== TABELA ======
   function buildForceTable(){
+    forceTable.querySelectorAll("tbody td[data-pressure]").forEach(td => {
+  td.addEventListener("click", (e) => {
+    e.stopPropagation(); // não conflitar com clique da linha
+    const row = td.parentElement;
+    const bore = row.getAttribute("data-bore");
+    const p = td.getAttribute("data-pressure");
+
+    boreSelect.value = bore;
+    pressureSelect.value = p;
+    highlightSelection();
+  });
+});
+
    highlightSelection();
     let thead = "<thead><tr><th>Ø (mm)</th><th>Rosca</th>";
     pressuresDisplay.forEach(p => {
@@ -361,6 +374,7 @@ function highlightSelection(){
 
 boreSelect?.addEventListener("change", highlightSelection);
 pressureSelect?.addEventListener("change", highlightSelection);
+
 
 
 
