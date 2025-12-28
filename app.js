@@ -150,15 +150,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
     forceTable.innerHTML = thead + tbody;
 
-    // Clique na linha seleciona Ø
     forceTable.querySelectorAll("tbody tr").forEach(tr => {
       tr.addEventListener("click", () => {
         boreSelect.value = tr.getAttribute("data-bore");
+        if (!pressureSelect.value) pressureSelect.value = "6";
         highlightSelection();
       });
     });
 
-    // Clique na célula seleciona Ø + pressão
     forceTable.querySelectorAll("tbody td[data-pressure]").forEach(td => {
       td.addEventListener("click", (e) => {
         e.stopPropagation();
@@ -286,6 +285,73 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // ====== DIMENSIONAR CILINDRO PELO TORQUE ======
   function calcCylinderFromTorque(){
+    const Td = Number(desiredTorqueInput.value || 0);
+    const unit = torqueUnitSelect.value || "kgfm";
+    const Lmm = Number(leverLengthInput.value || 0);
+    const a0 = Number(angleStartInput.value || 0);
+    const a1 = Number(angleEndInput.value || 0);
+
+    if(!Td || !Lmm || a0 === a1){
+      cylinderResult.classList.add("warn");
+      cylinderResult.innerHTML = "⚠ Preencha torque, braço e ângulos.";
+      return;
+    }
+
+    const TdNm = unit === "kgfm" ? Td * 9.80665 : Td;
+
+    const steps = 200;
+    let minSin = Infinity;
+    for(let i=0;i<=steps;i++){
+      const t = i/steps;
+      const ang = (a0 + (a1-a0)*t) * Math.PI/180;
+      minSin = Math.min(minSin, Math.sin(ang));
+    }
+
+    if(minSin <= 0){
+      cylinderResult.classList.add("warn");
+      cylinderResult.innerHTML = "⚠ Há ângulo com sen(θ) ≤ 0 no intervalo. Ajuste.";
+      return;
+    }
+
+    const L_m = Lmm/1000;
+    const Fneeded_N = TdNm / (L_m * minSin);
+    const Fneeded_kgf = Fneeded_N / 9.80665;
+
+    const pVal = Number(pressureSelect.value || 6);
+
+    let chosen = null;
+    let Fchosen_N = 0;
+
+    for(const b of bores){
+      const ext = getInterpolatedForce(b, pVal, "ext");
+      const extN = ext * 9.80665;
+      if(extN >= Fneeded_N){
+        chosen = b;
+        Fchosen_N = extN;
+        break;
+      }
+    }
+
+    if(!chosen){
+      cylinderResult.classList.add("warn");
+      cylinderResult.innerHTML =
+        `⚠ Nenhum Ø até 320 mm atende a ${pVal} bar.<br>` +
+        `Força mínima: <b>${Fneeded_kgf.toFixed(1)} kgf</b> (≈ ${Fneeded_N.toFixed(0)} N)`;
+      return;
+    }
+
+    const perc = (Fchosen_N/Fneeded_N)*100;
+    const margin = perc-100;
+
+    cylinderResult.classList.remove("warn");
+    cylinderResult.innerHTML =
+      `Força mínima: <b>${Fneeded_kgf.toFixed(1)} kgf</b> (≈ ${Fneeded_N.toFixed(0)} N)<br>` +
+      `Ø sugerido: <b>${chosen} mm</b> a ${pVal} bar<br>` +
+      `Força do Ø (avanço): <b>${(Fchosen_N/9.80665).toFixed(1)} kgf</b> (≈ ${Fchosen_N.toFixed(0)} N)<br><br>` +
+      `Entrega <b>${perc.toFixed(1)}%</b> do mínimo (margem ≈ <b>${margin.toFixed(1)}%</b>).` +
+      (margin < 20 ? `<br><br>⚠ <b>Atenção:</b> margem baixa — avalie Ø maior/pressão/fator de segurança.` : "");
+  }
+
   // ===================== CONSUMO PNEUMÁTICO (NL/min) =====================
   const airPressureDefault = document.getElementById("airPressureDefault");
   const airLossFactor = document.getElementById("airLossFactor");
@@ -298,28 +364,24 @@ document.addEventListener("DOMContentLoaded", () => {
   const airTable = document.getElementById("airTable");
   const airResult = document.getElementById("airResult");
 
-  // Estado da lista de cilindros
   let airRows = [];
 
   function mm2_to_m2(v){ return v * 1e-6; }
   function mm_to_m(v){ return v / 1000; }
 
   function calcCylinderVolumePerStroke_m3(boreMm, strokeMm){
-    const A = Math.PI * (boreMm*boreMm) / 4;   // mm²
-    return mm2_to_m2(A) * mm_to_m(strokeMm);  // m³
+    const A = Math.PI * (boreMm*boreMm) / 4;
+    return mm2_to_m2(A) * mm_to_m(strokeMm);
   }
 
   function calcRodVolumePerStroke_m3(rodMm, strokeMm){
     if(!rodMm) return 0;
-    const Arod = Math.PI * (rodMm*rodMm) / 4; // mm²
+    const Arod = Math.PI * (rodMm*rodMm) / 4;
     return mm2_to_m2(Arod) * mm_to_m(strokeMm);
   }
 
-  // Converte volume comprimido em "ar livre" (Normal Liters)
-  // Aproximação: NL = V(m³) * 1000(L/m³) * (P_abs / 1 bar)
-  // Onde P_abs = (P_gauge + 1) bar
   function volumeToNL(volume_m3, pressureGauge_bar){
-    const Pabs = Number(pressureGauge_bar) + 1; // bar absoluto
+    const Pabs = Number(pressureGauge_bar) + 1;
     return volume_m3 * 1000 * Pabs;
   }
 
@@ -356,18 +418,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
     airTable.innerHTML = thead + tbody;
 
-    // listeners inputs
     airTable.querySelectorAll("input[data-k]").forEach(inp => {
       inp.addEventListener("input", () => {
         const i = Number(inp.getAttribute("data-i"));
         const k = inp.getAttribute("data-k");
         const v = inp.value === "" ? null : Number(inp.value);
-
         airRows[i][k] = v;
       });
     });
 
-    // listeners delete
     airTable.querySelectorAll("button[data-del]").forEach(btn => {
       btn.addEventListener("click", () => {
         const i = Number(btn.getAttribute("data-del"));
@@ -378,12 +437,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function addAirRow(){
-    airRows.push({
-      bore: 32,
-      rod: null,    // opcional
-      stroke: 100,
-      cpm: 10
-    });
+    airRows.push({ bore: 32, rod: null, stroke: 100, cpm: 10 });
     renderAirTable();
   }
 
@@ -407,7 +461,6 @@ document.addEventListener("DOMContentLoaded", () => {
     const margin = Number(airCompressorMargin?.value || 1.0);
 
     let totalNLmin = 0;
-
     const lines = [];
 
     airRows.forEach((r, idx) => {
@@ -421,19 +474,13 @@ document.addEventListener("DOMContentLoaded", () => {
         return;
       }
 
-      const Vcap = calcCylinderVolumePerStroke_m3(bore, stroke); // volume da câmara cheia
-      const Vrod = calcRodVolumePerStroke_m3(rod, stroke);       // volume deslocado pela haste
+      const Vcap = calcCylinderVolumePerStroke_m3(bore, stroke);
+      const Vrod = calcRodVolumePerStroke_m3(rod, stroke);
 
-      // Dupla ação:
-      // Avanço: enche a câmara cheia (Vcap)
-      // Retorno: enche a câmara anular (Vcap - Vrod) (se rod não informado, Vrod = 0 → conservador)
       const NL_adv = volumeToNL(Vcap, p);
       const NL_ret = volumeToNL(Math.max(Vcap - Vrod, 0), p);
 
-      // por ciclo completo (avanço+retorno)
       const NL_cycle = NL_adv + NL_ret;
-
-      // NL/min
       const NL_min = NL_cycle * cpm;
 
       totalNLmin += NL_min;
@@ -441,8 +488,7 @@ document.addEventListener("DOMContentLoaded", () => {
       lines.push(
         `Cilindro ${idx+1}: ` +
         `Av ${NL_adv.toFixed(1)} NL + Ret ${NL_ret.toFixed(1)} NL = ` +
-        `${NL_cycle.toFixed(1)} NL/ciclo → ` +
-        `<b>${NL_min.toFixed(1)} NL/min</b>`
+        `${NL_cycle.toFixed(1)} NL/ciclo → <b>${NL_min.toFixed(1)} NL/min</b>`
       );
     });
 
@@ -456,7 +502,9 @@ document.addEventListener("DOMContentLoaded", () => {
       <hr style="border:0;border-top:1px solid rgba(255,255,255,.10); margin:10px 0;">
       <div><b>Total:</b> ${totalNLmin.toFixed(1)} NL/min</div>
       <div><b>Com perdas (×${loss.toFixed(2)}):</b> ${totalWithLoss.toFixed(1)} NL/min</div>
-      <div><b>Com margem do compressor (×${margin.toFixed(2)}):</b> <span style="font-size:16px;font-weight:900;">${totalWithMargin.toFixed(1)} NL/min</span></div>
+      <div><b>Com margem do compressor (×${margin.toFixed(2)}):</b>
+        <span style="font-size:16px;font-weight:900;">${totalWithMargin.toFixed(1)} NL/min</span>
+      </div>
       <div style="margin-top:8px; font-size:12px; color: var(--muted);">
         Nota: perdas representam válvulas, mangueiras e vazamentos típicos. Se houver muitas conexões/linhas longas, aumente o fator.
       </div>
@@ -465,8 +513,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function initAirConsumption(){
     if(!airTable || !airAddRowBtn || !airCalcBtn || !airClearRowsBtn) return;
-
-    // inicia com 1 linha pra facilitar
     if(airRows.length === 0) addAirRow();
 
     airAddRowBtn.addEventListener("click", addAirRow);
@@ -477,6 +523,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // ====== INIT ======
   fillSelects();
   buildForceTable();
+
   initAirConsumption();
 
   boreSelect.addEventListener("change", highlightSelection);
@@ -502,5 +549,3 @@ document.addEventListener("DOMContentLoaded", () => {
   calcCylinderBtn.addEventListener("click", calcCylinderFromTorque);
 
 });
-
-
