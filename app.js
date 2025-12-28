@@ -126,29 +126,40 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  function highlightSelection(){
-    const boreVal = Number(boreSelect.value || 0);
-    const pVal = Number(pressureSelect.value || 0);
+function highlightSelection(){
+  if (!forceTable) return;
 
-    forceTable.querySelectorAll(".highlight-row").forEach(el => el.classList.remove("highlight-row"));
-    forceTable.querySelectorAll(".highlight-pressure").forEach(el => el.classList.remove("highlight-pressure"));
-    forceTable.querySelectorAll(".highlight-cell").forEach(el => el.classList.remove("highlight-cell"));
+  const boreVal = Number(boreSelect?.value || 0);
+  const pVal = Number(pressureSelect?.value || 0);
 
-    if(boreVal){
-      const row = forceTable.querySelector(`tbody tr[data-bore="${boreVal}"]`);
-      if(row) row.classList.add("highlight-row");
-    }
-    if(pVal){
-      const th = forceTable.querySelector(`th[data-pressure="${pVal}"]`);
-      if(th) th.classList.add("highlight-pressure");
-      forceTable.querySelectorAll(`tbody td[data-pressure="${pVal}"]`).forEach(td => td.classList.add("highlight-cell"));
-    }
-    if(boreVal && pVal){
-      const row = forceTable.querySelector(`tbody tr[data-bore="${boreVal}"]`);
-      const cell = row ? row.querySelector(`td[data-pressure="${pVal}"]`) : null;
-      if(cell) cell.classList.add("highlight-cell");
-    }
+  // limpa classes
+  forceTable.querySelectorAll("tr.sel-row").forEach(el => el.classList.remove("sel-row"));
+  forceTable.querySelectorAll("th.sel-col").forEach(el => el.classList.remove("sel-col"));
+  forceTable.querySelectorAll("td.sel-col").forEach(el => el.classList.remove("sel-col"));
+  forceTable.querySelectorAll("td.sel-cell").forEach(el => el.classList.remove("sel-cell"));
+
+  // linha do Ø
+  let row = null;
+  if (boreVal) {
+    row = forceTable.querySelector(`tbody tr[data-bore="${boreVal}"]`);
+    if (row) row.classList.add("sel-row");
   }
+
+  // coluna da pressão (th + tds)
+  if (pVal) {
+    const th = forceTable.querySelector(`thead th[data-pressure="${pVal}"]`);
+    if (th) th.classList.add("sel-col");
+
+    forceTable.querySelectorAll(`tbody td[data-pressure="${pVal}"]`)
+      .forEach(td => td.classList.add("sel-col"));
+  }
+
+  // célula exata (Ø + pressão)
+  if (row && pVal) {
+    const cell = row.querySelector(`td[data-pressure="${pVal}"]`);
+    if (cell) cell.classList.add("sel-cell");
+  }
+}
 
   // ====== BOTÃO “USAR FORÇA DA TABELA” (AQUI ESTÁ O FIX) ======
   function useSelectedTableForce(){
@@ -346,3 +357,4 @@ document.addEventListener("DOMContentLoaded", () => {
   calcCylinderBtn.addEventListener("click", calcCylinderFromTorque);
 
 });
+
