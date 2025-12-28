@@ -477,6 +477,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // ====== INIT ======
   fillSelects();
   buildForceTable();
+  initAirConsumption();
 
   boreSelect.addEventListener("change", highlightSelection);
   pressureSelect.addEventListener("change", highlightSelection);
@@ -501,4 +502,5 @@ document.addEventListener("DOMContentLoaded", () => {
   calcCylinderBtn.addEventListener("click", calcCylinderFromTorque);
 
 });
+
 
