@@ -93,22 +93,40 @@ document.addEventListener("DOMContentLoaded", () => {
     `;
   }
 
+  // ====== DESTAQUE ======
+  function highlightSelection(){
+    if (!forceTable) return;
+
+    const boreVal = Number(boreSelect?.value || 0);
+    const pVal = Number(pressureSelect?.value || 0);
+
+    forceTable.querySelectorAll("tr.sel-row").forEach(el => el.classList.remove("sel-row"));
+    forceTable.querySelectorAll("th.sel-col").forEach(el => el.classList.remove("sel-col"));
+    forceTable.querySelectorAll("td.sel-col").forEach(el => el.classList.remove("sel-col"));
+    forceTable.querySelectorAll("td.sel-cell").forEach(el => el.classList.remove("sel-cell"));
+
+    let row = null;
+    if (boreVal) {
+      row = forceTable.querySelector(`tbody tr[data-bore="${boreVal}"]`);
+      if (row) row.classList.add("sel-row");
+    }
+
+    if (pVal) {
+      const th = forceTable.querySelector(`thead th[data-pressure="${pVal}"]`);
+      if (th) th.classList.add("sel-col");
+
+      forceTable.querySelectorAll(`tbody td[data-pressure="${pVal}"]`)
+        .forEach(td => td.classList.add("sel-col"));
+    }
+
+    if (row && pVal) {
+      const cell = row.querySelector(`td[data-pressure="${pVal}"]`);
+      if (cell) cell.classList.add("sel-cell");
+    }
+  }
+
   // ====== TABELA ======
   function buildForceTable(){
-    forceTable.querySelectorAll("tbody td[data-pressure]").forEach(td => {
-  td.addEventListener("click", (e) => {
-    e.stopPropagation(); // não conflitar com clique da linha
-    const row = td.parentElement;
-    const bore = row.getAttribute("data-bore");
-    const p = td.getAttribute("data-pressure");
-
-    boreSelect.value = bore;
-    pressureSelect.value = p;
-    highlightSelection();
-  });
-});
-
-   highlightSelection();
     let thead = "<thead><tr><th>Ø (mm)</th><th>Rosca</th>";
     pressuresDisplay.forEach(p => {
       thead += `<th data-pressure="${p}">${p} bar<br><span style="font-size:11px;">Av / Ret (kgf)</span></th>`;
@@ -132,50 +150,29 @@ document.addEventListener("DOMContentLoaded", () => {
 
     forceTable.innerHTML = thead + tbody;
 
+    // Clique na linha seleciona Ø
     forceTable.querySelectorAll("tbody tr").forEach(tr => {
       tr.addEventListener("click", () => {
         boreSelect.value = tr.getAttribute("data-bore");
         highlightSelection();
       });
     });
+
+    // Clique na célula seleciona Ø + pressão
+    forceTable.querySelectorAll("tbody td[data-pressure]").forEach(td => {
+      td.addEventListener("click", (e) => {
+        e.stopPropagation();
+        const row = td.parentElement;
+        boreSelect.value = row.getAttribute("data-bore");
+        pressureSelect.value = td.getAttribute("data-pressure");
+        highlightSelection();
+      });
+    });
+
+    highlightSelection();
   }
 
-function highlightSelection(){
-  if (!forceTable) return;
-
-  const boreVal = Number(boreSelect?.value || 0);
-  const pVal = Number(pressureSelect?.value || 0);
-
-  // limpa classes
-  forceTable.querySelectorAll("tr.sel-row").forEach(el => el.classList.remove("sel-row"));
-  forceTable.querySelectorAll("th.sel-col").forEach(el => el.classList.remove("sel-col"));
-  forceTable.querySelectorAll("td.sel-col").forEach(el => el.classList.remove("sel-col"));
-  forceTable.querySelectorAll("td.sel-cell").forEach(el => el.classList.remove("sel-cell"));
-
-  // linha do Ø
-  let row = null;
-  if (boreVal) {
-    row = forceTable.querySelector(`tbody tr[data-bore="${boreVal}"]`);
-    if (row) row.classList.add("sel-row");
-  }
-
-  // coluna da pressão (th + tds)
-  if (pVal) {
-    const th = forceTable.querySelector(`thead th[data-pressure="${pVal}"]`);
-    if (th) th.classList.add("sel-col");
-
-    forceTable.querySelectorAll(`tbody td[data-pressure="${pVal}"]`)
-      .forEach(td => td.classList.add("sel-col"));
-  }
-
-  // célula exata (Ø + pressão)
-  if (row && pVal) {
-    const cell = row.querySelector(`td[data-pressure="${pVal}"]`);
-    if (cell) cell.classList.add("sel-cell");
-  }
-}
-
-  // ====== BOTÃO “USAR FORÇA DA TABELA” (AQUI ESTÁ O FIX) ======
+  // ====== BOTÃO “USAR FORÇA DA TABELA” ======
   function useSelectedTableForce(){
     const boreVal = Number(boreSelect.value || 0);
     const pVal = Number(pressureSelect.value || 0);
@@ -246,59 +243,46 @@ function highlightSelection(){
       `<b>Torque mínimo (pior ponto):</b> ${TminKgfM.toFixed(2)} kgf·m (≈ ${Tmin.toFixed(2)} N·m)<br>` +
       `<b>Torque máximo (melhor ponto):</b> ${TmaxKgfM.toFixed(2)} kgf·m (≈ ${Tmax.toFixed(2)} N·m)`;
 
-if(chart) chart.destroy();
+    if(chart) chart.destroy();
 
-chart = new Chart(forceChartCanvas, {
-  type: "line",
-  data: {
-    labels: angles, // seus ângulos (string)
-    datasets: [{
-      label: "Torque (N·m)",
-      data: torques, // seus torques (N·m)
-      borderWidth: 2,
-      pointRadius: 0,
-      pointHoverRadius: 5,     // ✅ facilita pegar o ponto
-      hitRadius: 12,           // ✅ aumenta área de “acerto”
-      tension: 0.15
-    }]
-  },
-  options: {
-    responsive: true,
-    maintainAspectRatio: false, // ✅ faz respeitar a altura da .chart-box
-    animation: false,           // ✅ mais “snappy” pra análise
-    plugins: {
-      legend: { display: false },
-      tooltip: {
-        enabled: true,
-        intersect: false,
-        mode: "index",
-        callbacks: {
-          title: (items) => `θ = ${items[0].label}°`,
-          label: (item) => `Torque: ${Number(item.raw).toFixed(2)} N·m`
-        }
-      }
-    },
-    interaction: {
-      mode: "index",
-      intersect: false
-    },
-    scales: {
-      x: {
-        title: { display: true, text: "Ângulo θ (°)" },
-        ticks: {
-          maxTicksLimit: 12
-        }
+    chart = new Chart(forceChartCanvas, {
+      type: "line",
+      data: {
+        labels: angles,
+        datasets: [{
+          label: "Torque (N·m)",
+          data: torques,
+          borderWidth: 2,
+          pointRadius: 0,
+          pointHoverRadius: 5,
+          hitRadius: 12,
+          tension: 0.15
+        }]
       },
-      y: {
-        title: { display: true, text: "Torque (N·m)" },
-        ticks: {
-          callback: (v) => Number(v).toFixed(0)
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        animation: false,
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            enabled: true,
+            intersect: false,
+            mode: "index",
+            callbacks: {
+              title: (items) => `θ = ${items[0].label}°`,
+              label: (item) => `Torque: ${Number(item.raw).toFixed(2)} N·m`
+            }
+          }
+        },
+        interaction: { mode: "index", intersect: false },
+        scales: {
+          x: { title: { display: true, text: "Ângulo θ (°)" }, ticks: { maxTicksLimit: 12 } },
+          y: { title: { display: true, text: "Torque (N·m)" }, ticks: { callback: (v) => Number(v).toFixed(0) } }
         }
       }
-    }
+    });
   }
-});
-
 
   // ====== DIMENSIONAR CILINDRO PELO TORQUE ======
   function calcCylinderFromTorque(){
@@ -369,13 +353,9 @@ chart = new Chart(forceChartCanvas, {
       (margin < 20 ? `<br><br>⚠ <b>Atenção:</b> margem baixa — avalie Ø maior/pressão/fator de segurança.` : "");
   }
 
-  // ====== CONSUMO (mantido igual ao que estava ok) ======
-  function initAirConsumption(){ /* (mantém sua versão atual se já está OK) */ }
-
   // ====== INIT ======
   fillSelects();
   buildForceTable();
-  highlightSelection();
 
   boreSelect.addEventListener("change", highlightSelection);
   pressureSelect.addEventListener("change", highlightSelection);
@@ -395,18 +375,8 @@ chart = new Chart(forceChartCanvas, {
     highlightSelection();
   });
 
-  // ✅ FIX PRINCIPAL
   useTableForceBtn.addEventListener("click", useSelectedTableForce);
-
   calcTorqueBtn.addEventListener("click", calcTorqueAndChart);
   calcCylinderBtn.addEventListener("click", calcCylinderFromTorque);
 
 });
-
-boreSelect?.addEventListener("change", highlightSelection);
-pressureSelect?.addEventListener("change", highlightSelection);
-
-
-
-
-
