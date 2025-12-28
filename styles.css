@@ -95,10 +95,6 @@ th, td { border: 1px solid var(--border); padding: 6px 8px; text-align: center; 
 th { background: rgba(0,0,0,.25); color: #fff; }
 tbody tr:nth-child(even) td { background: rgba(255,255,255,.02); }
 
-.highlight-row td { outline: 2px solid rgba(226,59,59,.55); }
-.highlight-pressure { outline: 2px solid rgba(226,59,59,.55); }
-.highlight-cell { outline: 2px solid rgba(226,59,59,.55); background: rgba(226,59,59,.10); }
-
 .result {
   margin-top: 10px;
   padding: 10px 12px;
@@ -142,39 +138,36 @@ tbody tr:nth-child(even) td { background: rgba(255,255,255,.02); }
   color: var(--muted);
   line-height: 1.45;
 }
+
 /* Destaques da tabela (seleção do usuário) */
 #forceTable tr.sel-row td{
   background: rgba(255,255,255,.04);
 }
-
 #forceTable th.sel-col,
 #forceTable td.sel-col{
   background: rgba(226,59,59,.07);
 }
-
 #forceTable td.sel-cell{
   background: rgba(226,59,59,.18) !important;
   outline: 2px solid rgba(226,59,59,.75);
   box-shadow: inset 0 0 0 9999px rgba(226,59,59,.10);
 }
-
 #forceTable tr.sel-row td{
   outline: 1px solid rgba(255,255,255,.08);
 }
-
 #forceTable tr.sel-row td.sel-cell{
   outline: 2px solid rgba(226,59,59,.95);
 }
+
+/* Gráfico maior */
 .chart-box{
   margin-top: 16px;
-  height: 520px;              /* PC */
+  height: 520px;
   background: rgba(0,0,0,.12);
   border: 1px solid rgba(255,255,255,.10);
   border-radius: 14px;
   padding: 10px;
 }
-
 @media (max-width: 900px){
-  .chart-box{ height: 360px; } /* celular */
+  .chart-box{ height: 360px; }
 }
-
