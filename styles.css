@@ -165,3 +165,16 @@ tbody tr:nth-child(even) td { background: rgba(255,255,255,.02); }
 #forceTable tr.sel-row td.sel-cell{
   outline: 2px solid rgba(226,59,59,.95);
 }
+.chart-box{
+  margin-top: 16px;
+  height: 520px;              /* PC */
+  background: rgba(0,0,0,.12);
+  border: 1px solid rgba(255,255,255,.10);
+  border-radius: 14px;
+  padding: 10px;
+}
+
+@media (max-width: 900px){
+  .chart-box{ height: 360px; } /* celular */
+}
+
