@@ -286,71 +286,192 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // ====== DIMENSIONAR CILINDRO PELO TORQUE ======
   function calcCylinderFromTorque(){
-    const Td = Number(desiredTorqueInput.value || 0);
-    const unit = torqueUnitSelect.value || "kgfm";
-    const Lmm = Number(leverLengthInput.value || 0);
-    const a0 = Number(angleStartInput.value || 0);
-    const a1 = Number(angleEndInput.value || 0);
+  // ===================== CONSUMO PNEUMÁTICO (NL/min) =====================
+  const airPressureDefault = document.getElementById("airPressureDefault");
+  const airLossFactor = document.getElementById("airLossFactor");
+  const airCompressorMargin = document.getElementById("airCompressorMargin");
 
-    if(!Td || !Lmm || a0 === a1){
-      cylinderResult.classList.add("warn");
-      cylinderResult.innerHTML = "⚠ Preencha torque, braço e ângulos.";
+  const airAddRowBtn = document.getElementById("airAddRow");
+  const airCalcBtn = document.getElementById("airCalc");
+  const airClearRowsBtn = document.getElementById("airClearRows");
+
+  const airTable = document.getElementById("airTable");
+  const airResult = document.getElementById("airResult");
+
+  // Estado da lista de cilindros
+  let airRows = [];
+
+  function mm2_to_m2(v){ return v * 1e-6; }
+  function mm_to_m(v){ return v / 1000; }
+
+  function calcCylinderVolumePerStroke_m3(boreMm, strokeMm){
+    const A = Math.PI * (boreMm*boreMm) / 4;   // mm²
+    return mm2_to_m2(A) * mm_to_m(strokeMm);  // m³
+  }
+
+  function calcRodVolumePerStroke_m3(rodMm, strokeMm){
+    if(!rodMm) return 0;
+    const Arod = Math.PI * (rodMm*rodMm) / 4; // mm²
+    return mm2_to_m2(Arod) * mm_to_m(strokeMm);
+  }
+
+  // Converte volume comprimido em "ar livre" (Normal Liters)
+  // Aproximação: NL = V(m³) * 1000(L/m³) * (P_abs / 1 bar)
+  // Onde P_abs = (P_gauge + 1) bar
+  function volumeToNL(volume_m3, pressureGauge_bar){
+    const Pabs = Number(pressureGauge_bar) + 1; // bar absoluto
+    return volume_m3 * 1000 * Pabs;
+  }
+
+  function renderAirTable(){
+    if(!airTable) return;
+
+    const thead = `
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Ø (mm)</th>
+          <th>Haste (mm) <span style="opacity:.8;font-size:11px">(opcional)</span></th>
+          <th>Curso (mm)</th>
+          <th>Ciclos/min</th>
+          <th>Remover</th>
+        </tr>
+      </thead>
+    `;
+
+    let tbody = "<tbody>";
+    airRows.forEach((r, idx) => {
+      tbody += `
+        <tr>
+          <td>${idx+1}</td>
+          <td><input data-k="bore" data-i="${idx}" type="number" min="1" step="0.1" value="${r.bore}"></td>
+          <td><input data-k="rod" data-i="${idx}" type="number" min="0" step="0.1" value="${r.rod ?? ""}" placeholder="ex: 12"></td>
+          <td><input data-k="stroke" data-i="${idx}" type="number" min="1" step="1" value="${r.stroke}"></td>
+          <td><input data-k="cpm" data-i="${idx}" type="number" min="0" step="0.1" value="${r.cpm}"></td>
+          <td><button type="button" data-del="${idx}" style="background:#222;border:1px solid var(--border);">X</button></td>
+        </tr>
+      `;
+    });
+    tbody += "</tbody>";
+
+    airTable.innerHTML = thead + tbody;
+
+    // listeners inputs
+    airTable.querySelectorAll("input[data-k]").forEach(inp => {
+      inp.addEventListener("input", () => {
+        const i = Number(inp.getAttribute("data-i"));
+        const k = inp.getAttribute("data-k");
+        const v = inp.value === "" ? null : Number(inp.value);
+
+        airRows[i][k] = v;
+      });
+    });
+
+    // listeners delete
+    airTable.querySelectorAll("button[data-del]").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const i = Number(btn.getAttribute("data-del"));
+        airRows.splice(i, 1);
+        renderAirTable();
+      });
+    });
+  }
+
+  function addAirRow(){
+    airRows.push({
+      bore: 32,
+      rod: null,    // opcional
+      stroke: 100,
+      cpm: 10
+    });
+    renderAirTable();
+  }
+
+  function clearAirRows(){
+    airRows = [];
+    renderAirTable();
+    if(airResult) airResult.innerHTML = "";
+  }
+
+  function calcAirConsumption(){
+    if(!airResult) return;
+
+    if(airRows.length === 0){
+      airResult.classList.add("warn");
+      airResult.innerHTML = "⚠ Adicione pelo menos 1 cilindro para calcular.";
       return;
     }
 
-    const TdNm = unit === "kgfm" ? Td * 9.80665 : Td;
+    const p = Number(airPressureDefault?.value || 6);
+    const loss = Number(airLossFactor?.value || 1.0);
+    const margin = Number(airCompressorMargin?.value || 1.0);
 
-    const steps = 200;
-    let minSin = Infinity;
-    for(let i=0;i<=steps;i++){
-      const t = i/steps;
-      const ang = (a0 + (a1-a0)*t) * Math.PI/180;
-      minSin = Math.min(minSin, Math.sin(ang));
-    }
+    let totalNLmin = 0;
 
-    if(minSin <= 0){
-      cylinderResult.classList.add("warn");
-      cylinderResult.innerHTML = "⚠ Há ângulo com sen(θ) ≤ 0 no intervalo. Ajuste.";
-      return;
-    }
+    const lines = [];
 
-    const L_m = Lmm/1000;
-    const Fneeded_N = TdNm / (L_m * minSin);
-    const Fneeded_kgf = Fneeded_N / 9.80665;
+    airRows.forEach((r, idx) => {
+      const bore = Number(r.bore || 0);
+      const rod = r.rod === null ? 0 : Number(r.rod || 0);
+      const stroke = Number(r.stroke || 0);
+      const cpm = Number(r.cpm || 0);
 
-    const pVal = Number(pressureSelect.value || 6);
-
-    let chosen = null;
-    let Fchosen_N = 0;
-
-    for(const b of bores){
-      const ext = getInterpolatedForce(b, pVal, "ext");
-      const extN = ext * 9.80665;
-      if(extN >= Fneeded_N){
-        chosen = b;
-        Fchosen_N = extN;
-        break;
+      if(bore <= 0 || stroke <= 0 || cpm <= 0){
+        lines.push(`Cilindro ${idx+1}: ⚠ dados inválidos (Ø, curso e ciclos/min devem ser > 0).`);
+        return;
       }
-    }
 
-    if(!chosen){
-      cylinderResult.classList.add("warn");
-      cylinderResult.innerHTML =
-        `⚠ Nenhum Ø até 320 mm atende a ${pVal} bar.<br>` +
-        `Força mínima: <b>${Fneeded_kgf.toFixed(1)} kgf</b> (≈ ${Fneeded_N.toFixed(0)} N)`;
-      return;
-    }
+      const Vcap = calcCylinderVolumePerStroke_m3(bore, stroke); // volume da câmara cheia
+      const Vrod = calcRodVolumePerStroke_m3(rod, stroke);       // volume deslocado pela haste
 
-    const perc = (Fchosen_N/Fneeded_N)*100;
-    const margin = perc-100;
+      // Dupla ação:
+      // Avanço: enche a câmara cheia (Vcap)
+      // Retorno: enche a câmara anular (Vcap - Vrod) (se rod não informado, Vrod = 0 → conservador)
+      const NL_adv = volumeToNL(Vcap, p);
+      const NL_ret = volumeToNL(Math.max(Vcap - Vrod, 0), p);
 
-    cylinderResult.classList.remove("warn");
-    cylinderResult.innerHTML =
-      `Força mínima: <b>${Fneeded_kgf.toFixed(1)} kgf</b> (≈ ${Fneeded_N.toFixed(0)} N)<br>` +
-      `Ø sugerido: <b>${chosen} mm</b> a ${pVal} bar<br>` +
-      `Força do Ø (avanço): <b>${(Fchosen_N/9.80665).toFixed(1)} kgf</b> (≈ ${Fchosen_N.toFixed(0)} N)<br><br>` +
-      `Entrega <b>${perc.toFixed(1)}%</b> do mínimo (margem ≈ <b>${margin.toFixed(1)}%</b>).` +
-      (margin < 20 ? `<br><br>⚠ <b>Atenção:</b> margem baixa — avalie Ø maior/pressão/fator de segurança.` : "");
+      // por ciclo completo (avanço+retorno)
+      const NL_cycle = NL_adv + NL_ret;
+
+      // NL/min
+      const NL_min = NL_cycle * cpm;
+
+      totalNLmin += NL_min;
+
+      lines.push(
+        `Cilindro ${idx+1}: ` +
+        `Av ${NL_adv.toFixed(1)} NL + Ret ${NL_ret.toFixed(1)} NL = ` +
+        `${NL_cycle.toFixed(1)} NL/ciclo → ` +
+        `<b>${NL_min.toFixed(1)} NL/min</b>`
+      );
+    });
+
+    const totalWithLoss = totalNLmin * loss;
+    const totalWithMargin = totalWithLoss * margin;
+
+    airResult.classList.remove("warn");
+    airResult.innerHTML = `
+      <div style="margin-bottom:6px;"><b>Detalhamento</b></div>
+      <div style="font-size:13px; line-height:1.55;">${lines.join("<br>")}</div>
+      <hr style="border:0;border-top:1px solid rgba(255,255,255,.10); margin:10px 0;">
+      <div><b>Total:</b> ${totalNLmin.toFixed(1)} NL/min</div>
+      <div><b>Com perdas (×${loss.toFixed(2)}):</b> ${totalWithLoss.toFixed(1)} NL/min</div>
+      <div><b>Com margem do compressor (×${margin.toFixed(2)}):</b> <span style="font-size:16px;font-weight:900;">${totalWithMargin.toFixed(1)} NL/min</span></div>
+      <div style="margin-top:8px; font-size:12px; color: var(--muted);">
+        Nota: perdas representam válvulas, mangueiras e vazamentos típicos. Se houver muitas conexões/linhas longas, aumente o fator.
+      </div>
+    `;
+  }
+
+  function initAirConsumption(){
+    if(!airTable || !airAddRowBtn || !airCalcBtn || !airClearRowsBtn) return;
+
+    // inicia com 1 linha pra facilitar
+    if(airRows.length === 0) addAirRow();
+
+    airAddRowBtn.addEventListener("click", addAirRow);
+    airClearRowsBtn.addEventListener("click", clearAirRows);
+    airCalcBtn.addEventListener("click", calcAirConsumption);
   }
 
   // ====== INIT ======
@@ -380,3 +501,4 @@ document.addEventListener("DOMContentLoaded", () => {
   calcCylinderBtn.addEventListener("click", calcCylinderFromTorque);
 
 });
+
