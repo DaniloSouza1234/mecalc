@@ -1,0 +1,59 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="980" height="420" viewBox="0 0 980 420">
+  <defs>
+    <style>
+      .s{fill:none;stroke:#d9d9d9;stroke-width:4;stroke-linecap:round;stroke-linejoin:round}
+      .d{fill:none;stroke:#d9d9d9;stroke-width:3;stroke-dasharray:10 10;stroke-linecap:round}
+      .t{fill:#d9d9d9;font: 18px system-ui, -apple-system, Segoe UI, Arial}
+      .m{fill:#d9d9d9;font: 15px system-ui, -apple-system, Segoe UI, Arial}
+      .red{stroke:#ff4b4b}
+      .blue{stroke:#4aa3ff}
+      .thin{stroke-width:2}
+
+      /* Destaques amarelos (θ) */
+      .yl{stroke:#ffd54a}
+      .yt{fill:#ffd54a;font: 18px system-ui, -apple-system, Segoe UI, Arial;font-weight:800}
+      .ym{fill:#ffd54a;font: 15px system-ui, -apple-system, Segoe UI, Arial;font-weight:800}
+    </style>
+  </defs>
+
+  <!-- Título -->
+  <text x="24" y="42" class="t">Ângulo entre cilindro e alavanca (θ) — usar no cálculo do torque</text>
+  <text x="24" y="70" class="m">Meça no pino de ligação: θ = ângulo entre a alavanca (pivô → pino) e o eixo do cilindro (linha de ação).</text>
+
+  <!-- Pivô -->
+  <circle cx="200" cy="90" r="22" fill="none" stroke="#d9d9d9" stroke-width="4"/>
+  <circle cx="200" cy="90" r="6" fill="#d9d9d9"/>
+  <text x="236" y="96" class="m">Ponto de giro</text>
+
+  <!-- Alavanca (vermelho) -->
+  <line x1="200" y1="90" x2="280" y2="330" class="s red"/>
+  <text x="88" y="210" class="m">Alavanca</text>
+
+  <!-- Pino de ligação -->
+  <circle cx="280" cy="330" r="7" fill="#d9d9d9"/>
+  <text x="294" y="356" class="m">Pino</text>
+
+  <!-- Cilindro - posição inicial (tracejado) -->
+  <line x1="280" y1="330" x2="820" y2="300" class="d"/>
+  <text x="835" y="304" class="m">Eixo do cilindro (inicial)</text>
+
+  <!-- Cilindro - posição final (azul contínuo) -->
+  <line x1="280" y1="330" x2="820" y2="210" class="s blue"/>
+  <text x="835" y="214" class="m">Eixo do cilindro (final)</text>
+
+  <!-- Linha guia alavanca -->
+  <line x1="280" y1="330" x2="200" y2="90" class="d"/>
+
+  <!-- Arco θ0 (amarelo) -->
+  <path d="M 240 257 A 110 110 0 0 1 382 318" class="s thin yl"/>
+  <text x="392" y="326" class="yt">θ₀</text>
+  <text x="418" y="326" class="ym">(inicial)</text>
+
+  <!-- Arco θ1 (amarelo) -->
+  <path d="M 250 245 A 125 125 0 0 1 355 264" class="s thin yl"/>
+  <text x="365" y="246" class="yt">θ₁</text>
+  <text x="392" y="246" class="ym">(final)</text>
+
+  <!-- Observação -->
+  <text x="24" y="388" class="m">Dica: se θ ficar perto de 0° ou 180°, sin(θ) ≈ 0 e o torque cai muito (ponto crítico do dimensionamento).</text>
+</svg>
