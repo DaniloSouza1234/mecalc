@@ -246,28 +246,59 @@ function highlightSelection(){
       `<b>Torque mínimo (pior ponto):</b> ${TminKgfM.toFixed(2)} kgf·m (≈ ${Tmin.toFixed(2)} N·m)<br>` +
       `<b>Torque máximo (melhor ponto):</b> ${TmaxKgfM.toFixed(2)} kgf·m (≈ ${Tmax.toFixed(2)} N·m)`;
 
-    if(chart) chart.destroy();
+if(chart) chart.destroy();
 
-    chart = new Chart(forceChartCanvas, {
-      type: "line",
-      data: {
-        labels: angles,
-        datasets: [{
-          data: torques,
-          borderWidth: 2,
-          pointRadius: 0,
-          tension: 0.15
-        }]
-      },
-      options: {
-        plugins: { legend: { display: false } },
-        scales: {
-          x: { title: { display: true, text: "Ângulo θ (°)" } },
-          y: { title: { display: true, text: "Torque (N·m)" } }
+chart = new Chart(forceChartCanvas, {
+  type: "line",
+  data: {
+    labels: angles, // seus ângulos (string)
+    datasets: [{
+      label: "Torque (N·m)",
+      data: torques, // seus torques (N·m)
+      borderWidth: 2,
+      pointRadius: 0,
+      pointHoverRadius: 5,     // ✅ facilita pegar o ponto
+      hitRadius: 12,           // ✅ aumenta área de “acerto”
+      tension: 0.15
+    }]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false, // ✅ faz respeitar a altura da .chart-box
+    animation: false,           // ✅ mais “snappy” pra análise
+    plugins: {
+      legend: { display: false },
+      tooltip: {
+        enabled: true,
+        intersect: false,
+        mode: "index",
+        callbacks: {
+          title: (items) => `θ = ${items[0].label}°`,
+          label: (item) => `Torque: ${Number(item.raw).toFixed(2)} N·m`
         }
       }
-    });
+    },
+    interaction: {
+      mode: "index",
+      intersect: false
+    },
+    scales: {
+      x: {
+        title: { display: true, text: "Ângulo θ (°)" },
+        ticks: {
+          maxTicksLimit: 12
+        }
+      },
+      y: {
+        title: { display: true, text: "Torque (N·m)" },
+        ticks: {
+          callback: (v) => Number(v).toFixed(0)
+        }
+      }
+    }
   }
+});
+
 
   // ====== DIMENSIONAR CILINDRO PELO TORQUE ======
   function calcCylinderFromTorque(){
@@ -374,6 +405,7 @@ function highlightSelection(){
 
 boreSelect?.addEventListener("change", highlightSelection);
 pressureSelect?.addEventListener("change", highlightSelection);
+
 
 
 
